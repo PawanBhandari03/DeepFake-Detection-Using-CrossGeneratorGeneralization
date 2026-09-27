@@ -1,0 +1,10 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Datasets and extracted features (large, re-downloadable)
+data/
+
+# Generated PDFs (kept only for sharing)
+*.pdf

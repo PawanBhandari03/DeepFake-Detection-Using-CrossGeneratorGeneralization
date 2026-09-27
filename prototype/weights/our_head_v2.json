@@ -1,0 +1,13 @@
+{
+ "name": "Our model v2 (many generators, never ChatGPT or Gemini)",
+ "trained_on": "real photos vs 7 GenImage generators + about 60 modern OpenFake generators; every OpenAI (ChatGPT, DALL-E) and Google (Gemini, Imagen, Veo) model was kept out",
+ "normalize_features": true,
+ "use_frequency": true,
+ "jpeg_quality": 95,
+ "regularization_C": 10.0,
+ "variant": "v2",
+ "held_out": [
+  "all Google models (Nano Banana, Nano Banana Pro, Imagen 3/4, Veo 3)",
+  "all OpenAI models (GPT-Image-1, GPT-Image-1.5, DALL-E 3)"
+ ]
+}

@@ -1,0 +1,13 @@
+# Image prototype (Phase 1) — install with:  pip install -r prototype/requirements.txt
+torch>=2.2            # deep learning framework (CPU build is enough)
+torchvision>=0.17     # image transforms (center crop, normalization)
+open_clip_torch>=2.24 # loads OpenAI's CLIP ViT-L/14 image encoder
+streamlit>=1.38       # web interface (upload page, results, test page)
+pillow>=10.0          # reads JPG, PNG, WEBP, BMP, TIFF, GIF
+pillow-heif>=0.16     # adds iPhone HEIC/HEIF support to Pillow
+numpy>=1.26           # arrays, FFT for the frequency spectrum
+matplotlib>=3.8       # colour maps for heatmaps and spectrum images
+scikit-learn>=1.4     # logistic regression, AUC and accuracy metrics
+pandas>=2.0           # tables on the Cross-Generator Test page
+pyarrow>=15.0         # reads the downloaded dataset files (parquet)
+huggingface_hub>=0.23 # downloads model weights and dataset files

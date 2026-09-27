@@ -1,0 +1,9 @@
+{
+ "name": "Our model (trained on SD15 only)",
+ "trained_on": "GenImage: 800 real ImageNet photos vs 800 SD15 images",
+ "normalize_features": true,
+ "use_frequency": true,
+ "jpeg_quality": 95,
+ "regularization_C": 30.0,
+ "variant": "jpeg_clip_freq"
+}
