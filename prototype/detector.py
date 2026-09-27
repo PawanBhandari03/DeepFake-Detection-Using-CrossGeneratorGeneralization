@@ -71,14 +71,33 @@ def jpeg_normalize(img: Image.Image, quality: int = 95) -> Image.Image:
 # ----------------------------------------------------------------------------
 # CLIP encoder (shared by all heads)
 # ----------------------------------------------------------------------------
+CLIP_REPO = "timm/vit_large_patch14_clip_224.openai"      # OpenAI's CLIP ViT-L/14 weights
+CLIP_FILE = "open_clip_model.safetensors"
+
+
 class ClipEncoder:
-    """OpenAI CLIP ViT-L/14 image encoder, frozen (never trained by us)."""
+    """OpenAI CLIP ViT-L/14 image encoder, frozen (never trained by us).
+
+    Only the image part of CLIP is loaded (we never use its text part). The weights are read
+    tensor by tensor straight into the model, so memory stays around 1.2 GB instead of 3+ GB.
+    That lets the app run on free hosting with a 2.7 GB memory limit. Results are identical
+    to loading the full model (same weights, same precision).
+    """
 
     def __init__(self, device: str = "cpu"):
         import open_clip
+        from huggingface_hub import hf_hub_download
+        from open_clip.model import _build_vision_tower
+        from safetensors import safe_open
 
-        model, _, _ = open_clip.create_model_and_transforms("ViT-L-14-quickgelu", pretrained="openai")
-        self.model = model.to(device).eval()
+        cfg = open_clip.get_model_config("ViT-L-14-quickgelu")
+        with torch.device("meta"):   # build the network shape without allocating memory
+            visual = _build_vision_tower(cfg["embed_dim"], cfg["vision_cfg"], quick_gelu=cfg.get("quick_gelu", True))
+        path = hf_hub_download(CLIP_REPO, CLIP_FILE)
+        with safe_open(path, framework="pt") as f:
+            weights = {k[len("visual."):]: f.get_tensor(k) for k in f.keys() if k.startswith("visual.")}
+        visual.load_state_dict(weights, assign=True)
+        self.visual = visual.to(device).eval()
         self.device = device
         self.to_input = transforms.Compose([transforms.ToTensor(), transforms.Normalize(CLIP_MEAN, CLIP_STD)])
 
@@ -87,7 +106,7 @@ class ClipEncoder:
         out = []
         for i in range(0, len(patches), batch_size):
             batch = torch.stack([self.to_input(p) for p in patches[i:i + batch_size]]).to(self.device)
-            out.append(self.model.encode_image(batch).float().cpu().numpy())
+            out.append(self.visual(batch).float().cpu().numpy())
         return np.concatenate(out, axis=0)
 
 

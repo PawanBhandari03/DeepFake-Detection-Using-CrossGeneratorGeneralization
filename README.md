@@ -4,6 +4,8 @@
 
 Upload an image and get a **Trust Score (0–100)**, a verdict (*Likely Authentic / Needs Human Review / Likely AI-generated*), a heatmap and a plain-language explanation. The core idea is **cross-generator generalization**: the detector must catch images from AI tools it **never saw during training**.
 
+> **Live demo:** https://deepfake-detector-perceptrons.streamlit.app — free hosting; if it has been asleep, click the wake-up button and wait about a minute.
+>
 > Status: **Phase 1 (images) — working prototype.** Video (Phase 2) and document tamper localization (Phase 3) follow. See the [roadmap](PROJECT_ROADMAP.md).
 
 ---

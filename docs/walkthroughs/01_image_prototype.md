@@ -287,3 +287,19 @@ To repeat the experiment: `python prototype/experiment.py extract`, then `train`
 12. Caught a problem before training v2: the OpenFake train split contained `gpt-image-1` (OpenAI) and `nano-banana` (Google). **Removed every OpenAI and Google image** and added an automatic check, so ChatGPT and Gemini stay truly unseen.
 13. Corrected the "seen/unseen" labels: many modern generators have related versions in v2's training (for example Midjourney v6 → v7), so for v2 only the OpenAI/Google generators are counted as unseen.
 14. Checked v2 on large real camera photos (no false "AI" verdicts), removed the uninformative spectral-peak sentence, redesigned the Cross-Generator page, and re-tested every page with screenshots.
+15. Pushed everything to GitHub (commits by PawanBhandari03 only).
+16. Prepared free online hosting (Section 14): the app now loads only the image part of CLIP, read piece by piece — memory went from over 3 GB to a peak of about 1.5 GB, with identical results and a 2-second model load.
+
+---
+
+## 14. Free online hosting (Streamlit Community Cloud)
+
+**Why Streamlit Community Cloud:** it is free (no credit card), our app is already a Streamlit app, and it updates itself on every GitHub push — like Vercel. (Vercel/Render free plans cannot run a 1+ GB AI model; Hugging Face now requires a paid plan for this kind of app.)
+
+**Why the app is "big":** not because of the datasets (those stay on the laptop and are only used for training). The size comes from **CLIP**, the pretrained model we build on — about 1.2 GB for its image part. Our own trained part is only about 4 KB.
+
+**What we changed to fit the free limit (2.7 GB memory):** we load only CLIP's image part (we never use its text part) and read the weights file piece by piece. Peak memory: about **1.5 GB**. Results are identical.
+
+**Sleeping:** free apps sleep after 12 hours without visitors. A GitHub Action in our repo (`.github/workflows/keep-awake.yml`) opens the app every 6 hours and clicks "wake up" if needed.
+
+**Speed:** the free servers are slower than a laptop, so an image may take 30–60 seconds online.

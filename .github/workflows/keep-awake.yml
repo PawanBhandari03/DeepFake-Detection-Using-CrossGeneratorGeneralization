@@ -1,0 +1,41 @@
+# Streamlit Community Cloud puts free apps to sleep after 12 hours without visitors.
+# Every 6 hours this opens the app in a real browser and, if it is asleep, clicks "wake up".
+# Change the address in repo Settings -> Secrets and variables -> Actions -> Variables -> APP_URL.
+name: Keep app awake
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install a headless browser
+        run: pip install playwright && python -m playwright install --with-deps chromium
+      - name: Visit the app and wake it if it is sleeping
+        env:
+          APP_URL: ${{ vars.APP_URL || 'https://deepfake-detector-perceptrons.streamlit.app' }}
+        run: |
+          python - <<'EOF'
+          import os
+          from playwright.sync_api import sync_playwright
+
+          url = os.environ["APP_URL"]
+          with sync_playwright() as p:
+              page = p.chromium.launch().new_page()
+              page.goto(url, timeout=120_000)
+              page.wait_for_timeout(10_000)
+              wake = page.get_by_role("button", name="Yes, get this app back up!")
+              if wake.count():
+                  print("App was asleep - waking it up")
+                  wake.click()
+                  page.wait_for_timeout(90_000)
+              else:
+                  print("App is awake:", url)
+          EOF
