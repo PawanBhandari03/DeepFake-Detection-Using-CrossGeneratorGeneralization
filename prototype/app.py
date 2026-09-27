@@ -1,10 +1,9 @@
-"""Streamlit web app — image prototype of the Unified Content Authenticity Verification System.
+"""Streamlit web app — DeepFake Detection · Upload an image, get a result.
 
-Run:  .venv\\Scripts\\streamlit run prototype\\app.py
+Run:  .venv\\Scripts\\python.exe -m streamlit run prototype\\app.py
 """
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
@@ -18,26 +17,24 @@ from forensics import (SUPPORTED_TYPES, ImageLoadError, ela_image, load_image,  
                        read_metadata, spectral_peak_score, spectrum_image)
 from trust import explain, heatmap_overlay, peak_threshold, trust_score, verdict  # noqa: E402
 
-HERE = Path(__file__).parent
-RESULTS_FILE = HERE / "results" / "crossgen_results.json"
-TEST_IMAGES = HERE / "test_images"
+st.set_page_config(
+    page_title="DeepFake Detector",
+    page_icon="🛡️",
+    layout="wide",
+)
 
-st.set_page_config(page_title="Content Authenticity Checker", page_icon="🛡️", layout="wide")
+# ── minimal style ────────────────────────────────────────────────────────────
+st.markdown("""
+<style>
+#MainMenu, header, footer {visibility: hidden;}
+.block-container {padding-top: 2rem;}
+</style>
+""", unsafe_allow_html=True)
 
 
-@st.cache_resource(show_spinner="Loading the AI detector (first time only, about 30 seconds)...")
+@st.cache_resource(show_spinner="Loading AI detector (first run ~30 s)…")
 def get_detector() -> Detector:
     return Detector()
-
-
-def model_picker() -> str:
-    det = get_detector()
-    keys = list(det.heads)
-    default = next((keys.index(k) for k in ("ours_v2", "ours") if k in keys), 0)
-    key = st.sidebar.selectbox("Detector model", keys, index=default,
-                               format_func=lambda k: det.heads[k].name)
-    st.sidebar.caption(f"Trained on: {det.heads[key].trained_on}")
-    return key
 
 
 def score_card(score: int, p_fake: float) -> None:
@@ -55,267 +52,91 @@ def score_card(score: int, p_fake: float) -> None:
     )
 
 
-# ============================================================================
-# Page 1 - Check an image
-# ============================================================================
-def page_check() -> None:
-    st.title("🛡️ Is this image real or AI-generated?")
-    st.caption("Prototype · Phase 1 (images) · Unified Content Authenticity Verification System · The Perceptrons")
-    head_key = model_picker()
+# ── main ──────────────────────────────────────────────────────────────────────
+st.title("🛡️ DeepFake Image Detector")
+st.caption("Upload any image — get an instant AI authenticity verdict.")
 
-    upload = st.file_uploader("Drag and drop an image (JPG, PNG, WEBP, BMP, TIFF, GIF, HEIC)", type=SUPPORTED_TYPES)
-    samples = sorted(p for p in TEST_IMAGES.glob("*/*") if p.suffix.lower().lstrip(".") in SUPPORTED_TYPES) \
-        if TEST_IMAGES.exists() else []
-    sample = None
-    if upload is None and samples:
-        sample = st.selectbox("...or try a sample image", [None] + samples,
-                              format_func=lambda p: "(choose a sample)" if p is None else f"{p.parent.name} / {p.name}")
-    if upload is None and sample is None:
-        st.info("Upload an image to get its Trust Score, verdict, heatmap and explanation.")
-        return
-    data, name = (upload.getvalue(), upload.name) if upload is not None else (sample.read_bytes(), sample.name)
+upload = st.file_uploader(
+    "Drag & drop or click to upload an image (JPG, PNG, WEBP, BMP, TIFF, GIF, HEIC)",
+    type=SUPPORTED_TYPES,
+)
 
-    try:
-        loaded = load_image(data)
-    except ImageLoadError as exc:
-        st.error(str(exc))
-        return
+if upload is None:
+    st.info("⬆️ Upload an image above to check whether it is real or AI-generated.")
+    st.stop()
 
-    det = get_detector()
-    with st.spinner("Analysing the image (about 10-20 seconds on a laptop CPU)..."):
-        result = det.analyze(loaded.rgb, head_key, grid=3)
-        peak = spectral_peak_score(loaded.rgb)
-        meta = read_metadata(loaded)
-    score = trust_score(result.probability)
+# ── analyse ───────────────────────────────────────────────────────────────────
+try:
+    loaded = load_image(upload.getvalue())
+except ImageLoadError as exc:
+    st.error(str(exc))
+    st.stop()
 
-    left, right = st.columns([1.15, 1])
-    with left:
-        st.image(loaded.rgb, caption=f"{name} · {meta['format']} · {meta['size']} px", width="stretch")
-    with right:
-        score_card(score, result.probability)
-        st.markdown("#### Why?")
-        for line in explain(result.probability, result.grid, peak, meta):
-            st.markdown(f"- {line}")
-        st.caption(f"Model: {result.head.name} — trained on {result.head.trained_on}.")
+det = get_detector()
+# pick the best available head automatically
+keys = list(det.heads)
+head_key = next((k for k in ("ours_v2", "ours") if k in keys), keys[0])
 
-    tab_heat, tab_freq, tab_ela, tab_meta, tab_tech = st.tabs(
-        ["🔥 Heatmap", "📈 Frequency spectrum", "🔍 Error Level Analysis", "📄 File & metadata", "⚙️ Technical details"])
-    with tab_heat:
-        st.image(heatmap_overlay(loaded.rgb, result.grid), width="stretch",
-                 caption="Red = patches that look AI-generated, green = patches that look real.")
-        st.caption("The image is checked as a 3 x 3 grid of 224 x 224 patches at full resolution, plus the centre. "
-                   "This prototype heatmap is coarse; precise pixel-level maps come later (U-Net, Phase 3).")
-    with tab_freq:
-        c1, c2 = st.columns(2)
-        c1.image(spectrum_image(loaded.rgb), width="stretch",
-                 caption="Fourier spectrum of the image's fine noise (centre = low frequencies).")
-        with c2:
-            st.metric("Spectral peak strength", f"{peak:.1f}", help="How much the strongest isolated peaks stand out.")
-            st.write("Older AI generators (especially GANs) build images by repeated up-sampling, which can leave "
-                     "bright dots or grid lines in this picture. Real camera photos usually give a smooth, cloudy spectrum.")
-            st.caption(f"Honest note: in our experiment this single number did not separate real from modern AI images "
-                       f"(95% of real photos stayed below {peak_threshold():.1f}, and AI images looked the same), so it "
-                       "is shown for learning and is not used in the Trust Score or the explanation.")
-    with tab_ela:
-        c1, c2 = st.columns(2)
-        c1.image(ela_image(loaded.rgb), width="stretch", caption="Error Level Analysis (brighter = changes more on re-saving)")
-        c2.write("Error Level Analysis re-saves the image as JPEG and shows how much each area changes. "
-                 "In an edited JPEG photo, pasted or retouched regions often look brighter or darker than the rest.")
-        if meta["format"] != "JPEG":
-            c2.warning(f"This file is {meta['format']}, not JPEG, so ELA is less informative here.")
-    with tab_meta:
-        info = {"File format (from file bytes)": meta["format"], "Size": meta["size"], "Colour mode": meta["colour mode"]}
-        info.update(meta["exif"] or {"Camera EXIF": "none found"})
-        info["AI / provenance markers"] = "; ".join(meta["ai markers"]) or "none found"
-        for k, v in meta["text chunks"].items():
-            info[f"Embedded text '{k}'"] = v
-        st.table(pd.DataFrame(info.items(), columns=["Field", "Value"]))
-        for note in loaded.notes:
-            st.caption("ℹ️ " + note)
-        st.caption("Metadata is shown separately from the model score: it helps when present, but it is easy to remove "
-                   "(for example by taking a screenshot).")
-    with tab_tech:
-        st.write(f"**Model:** {result.head.name}  \n**Trained on:** {result.head.trained_on}")
-        st.write(f"**Mean logit:** {result.logit:.3f} → probability = sigmoid(logit) = {result.probability:.3f}  \n"
-                 f"**Centre patch probability:** {result.center_probability:.3f}  \n"
-                 f"**Trust Score** = round(100 × (1 − {result.probability:.3f})) = {score}")
-        st.write("Patch probabilities (3 x 3 grid):")
-        st.dataframe(pd.DataFrame(np.round(result.grid, 3)), width="content")
+with st.spinner("Analysing… (10-20 s on CPU)"):
+    result = det.analyze(loaded.rgb, head_key, grid=3)
+    peak   = spectral_peak_score(loaded.rgb)
+    meta   = read_metadata(loaded)
 
+score = trust_score(result.probability)
 
-# ============================================================================
-# Page 2 - Cross-Generator Test
-# ============================================================================
-def page_crossgen() -> None:
-    st.title("🧪 Cross-Generator Test")
-    st.write("**Cross-generator generalization** means the detector still works on images from AI tools it "
-             "**never saw during training**. We train on some generators and test on others it has never seen.")
+# ── results ───────────────────────────────────────────────────────────────────
+left, right = st.columns([1.15, 1])
+with left:
+    st.image(loaded.rgb,
+             caption=f"{upload.name} · {meta['format']} · {meta['size']} px",
+             width="stretch")
+with right:
+    score_card(score, result.probability)
+    st.markdown("#### Why?")
+    for line in explain(result.probability, result.grid, peak, meta):
+        st.markdown(f"- {line}")
+    st.caption(f"Model: {result.head.name} — trained on {result.head.trained_on}.")
 
-    if RESULTS_FILE.exists():
-        res = json.loads(RESULTS_FILE.read_text())
-        df = pd.DataFrame(res["rows"])
-        main = [m for m in ("v2", "jpeg_clip_freq", "ufd") if m in set(df.model)]
-        label = {"v2": "Our model v2", "jpeg_clip_freq": "Our model v1", "ufd": "UniversalFakeDetect",
-                 "jpeg_clip": "v1 without frequency", "raw_clip": "v1 without format fix"}
-        trained = {"v2": "Many generators, no OpenAI / Google",
-                   "jpeg_clip_freq": "Only SD1.5",
-                   "ufd": "Only ProGAN (2018)"}
+# ── detail tabs ───────────────────────────────────────────────────────────────
+tab_heat, tab_freq, tab_ela, tab_meta, tab_tech = st.tabs(
+    ["🔥 Heatmap", "📈 Frequency", "🔍 ELA", "📄 Metadata", "⚙️ Technical"])
 
-        def cell(model, ds, src, field="auc"):
-            r = df[(df.model == model) & (df.dataset == ds) & (df.source == src)]
-            if r.empty or r.iloc[0][field] is None or pd.isna(r.iloc[0][field]):
-                return None
-            return float(r.iloc[0][field])
+with tab_heat:
+    st.image(heatmap_overlay(loaded.rgb, result.grid), width="stretch",
+             caption="Red = AI-like patches · Green = real-looking patches.")
 
-        def unseen_mean(model, ds):
-            r = df[(df.model == model) & (df.dataset == ds) & (df.source != "Real") & ~df.source.str.startswith("ALL")
-                   & (df.n >= 10) & ~df.seen.astype(bool)]
-            return float(r.auc.mean()) if len(r) else None
+with tab_freq:
+    c1, c2 = st.columns(2)
+    c1.image(spectrum_image(loaded.rgb), width="stretch",
+             caption="Fourier spectrum of image noise.")
+    with c2:
+        st.metric("Spectral peak strength", f"{peak:.1f}")
+        st.write("GAN images can leave bright dots in this spectrum. "
+                 "Real photos give a smooth, cloudy pattern.")
 
-        st.subheader("Summary")
-        chat = "GPT-Image-1.5 (ChatGPT, OpenAI)"
-        gem = "Nano Banana Pro (Gemini, Google)"
-        def fmt(auc, acc=None):
-            if auc is None:
-                return "—"
-            return f"{auc:.2f}" + (f" · {acc * 100:.0f}% caught" if acc is not None else "")
+with tab_ela:
+    c1, c2 = st.columns(2)
+    c1.image(ela_image(loaded.rgb), width="stretch",
+             caption="Error Level Analysis — brighter = more re-save change.")
+    c2.write("ELA re-saves as JPEG and highlights regions that changed most. "
+             "Edited or pasted areas often stand out.")
+    if meta["format"] != "JPEG":
+        c2.warning(f"This file is {meta['format']}, not JPEG — ELA is less informative.")
 
-        summary = []
-        for m in main:
-            summary.append({
-                "Model": label[m], "Trained on": trained[m],
-                "ChatGPT images": fmt(cell(m, "OpenFake", chat), cell(m, "OpenFake", chat, "accuracy")),
-                "Gemini images (4)": fmt(cell(m, "OpenFake", gem), cell(m, "OpenFake", gem, "accuracy")),
-                "Modern generators it never saw": fmt(unseen_mean(m, "OpenFake")),
-                "Real photos correct": f"{cell(m, 'OpenFake', 'Real', 'accuracy') * 100:.0f}%",
-            })
-        st.dataframe(pd.DataFrame(summary), hide_index=True, width="stretch")
-        st.caption("None of these three models ever saw a ChatGPT or Gemini image. Numbers are AUC (how well the model "
-                   "separates that generator's images from real photos: 0.5 = guessing, 1.0 = perfect) and the share of "
-                   "images labelled AI at probability 0.5. \"Modern generators it never saw\" = average AUC over OpenFake "
-                   "generators that model never saw (at least 10 test images each). v2 = our improved model; "
-                   "v1 = the pure experiment trained on one generator; UniversalFakeDetect = published model.")
+with tab_meta:
+    info = {"File format": meta["format"], "Size": meta["size"], "Colour mode": meta["colour mode"]}
+    info.update(meta["exif"] or {"Camera EXIF": "none found"})
+    info["AI / provenance markers"] = "; ".join(meta["ai markers"]) or "none found"
+    for k, v in meta["text chunks"].items():
+        info[f"Embedded text '{k}'"] = v
+    st.table(pd.DataFrame(info.items(), columns=["Field", "Value"]))
+    for note in loaded.notes:
+        st.caption("ℹ️ " + note)
 
-        st.subheader("Every generator, side by side")
-        ds_choice = st.radio("Test set", ["OpenFake (modern, 2024-2026)", "GenImage (2018-2022)"], horizontal=True)
-        ds = ds_choice.split()[0]
-        sub = df[(df.dataset == ds) & df.model.isin(main) & ~df.source.str.startswith("ALL")]
-        table = []
-        for src in sub[sub.model == main[-1]].source:
-            row = {"Source": src, "Year": "", "Images": None}
-            for m in main:
-                r = sub[(sub.model == m) & (sub.source == src)]
-                if r.empty:
-                    continue
-                r = r.iloc[0]
-                row["Year"] = str(r.year) if r.year else ""
-                row["Images"] = int(r.n)
-                if src == "Real":
-                    row[label[m]] = f"{r.accuracy * 100:.0f}% correct"
-                    continue
-                if not r.seen:
-                    mark = "❌ unseen"
-                elif m == "v2" and ds == "OpenFake":
-                    mark = "≈ similar seen"
-                else:
-                    mark = "✅ seen"
-                row[label[m]] = f"{mark} · {r.auc:.2f} · {r.accuracy * 100:.0f}%"
-            table.append(row)
-        st.dataframe(pd.DataFrame(table), hide_index=True, width="stretch")
-        st.caption("Each cell: whether that model saw this generator in training (≈ similar seen = a related version "
-                   "was in training) · AUC · % of that generator's images labelled AI at probability 0.5. "
-                   "For real photos: % labelled real. Sources with fewer than 10 images are too small to trust.")
-        chart = sub[sub.source != "Real"].assign(model_name=sub.model.map(label)).pivot_table(
-            index="source", columns="model_name", values="auc")
-        if not chart.empty:
-            st.write("**AUC per generator** (higher is better; 0.5 = guessing)")
-            st.bar_chart(chart, horizontal=True, stack=False, height=520)
-    else:
-        st.warning("Experiment results not found yet (prototype/results/crossgen_results.json). "
-                   "Run `python prototype/experiment.py extract` then `train`.")
-
-    st.divider()
-    st.subheader("Test your own images")
-    st.write("Put images into folders inside `prototype/test_images/` — one folder per source, for example "
-             "`real/`, `chatgpt/`, `gemini/`. The folder named **real** holds real photos; every other folder is "
-             "treated as AI-generated. Fast mode checks the centre patch of each image (about 1 second per image).")
-    head_key = model_picker()
-    folders = sorted(p for p in TEST_IMAGES.iterdir() if p.is_dir()) if TEST_IMAGES.exists() else []
-    counts = {f.name: len([p for p in f.iterdir() if p.suffix.lower().lstrip('.') in SUPPORTED_TYPES]) for f in folders}
-    st.write("Folders found: " + (", ".join(f"`{k}` ({v} images)" for k, v in counts.items()) or "none"))
-    if st.button("Run the test on these folders", type="primary", disabled=not any(counts.values())):
-        det = get_detector()
-        rows, progress = [], st.progress(0.0, text="Starting...")
-        files = [(f.name, p) for f in folders for p in sorted(f.iterdir())
-                 if p.suffix.lower().lstrip(".") in SUPPORTED_TYPES]
-        per_source: dict[str, list[float]] = {}
-        for i, (source, path) in enumerate(files, 1):
-            try:
-                img = load_image(path.read_bytes()).rgb
-                p = det.analyze(img, head_key, grid=1).center_probability
-                per_source.setdefault(source, []).append(p)
-            except ImageLoadError:
-                pass
-            progress.progress(i / len(files), text=f"{i}/{len(files)}: {source}/{path.name}")
-        for source, ps in per_source.items():
-            ps = np.array(ps)
-            is_real = source.lower() == "real"
-            correct = np.mean(ps < 0.5) if is_real else np.mean(ps >= 0.5)
-            rows.append({"Source": source, "Type": "real photos" if is_real else "AI-generated",
-                         "Images": len(ps), "Detected correctly": f"{correct * 100:.1f} %",
-                         "Average AI probability": round(float(ps.mean()), 3)})
-        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
-        st.caption(f"Model: {det.heads[head_key].name}. A small hand-made test set is a demonstration, not a scientific result.")
-
-
-# ============================================================================
-# Page 3 - How it works
-# ============================================================================
-def page_how() -> None:
-    st.title("ℹ️ How it works")
-    st.graphviz_chart("""
-digraph G {
-  rankdir=LR; node [shape=box, style="rounded,filled", fillcolor="#E8EAF6", color="#3949AB", fontname="Helvetica"];
-  up [label="Upload\\n(any image format)"]; std [label="Convert to\\nstandard RGB"];
-  crops [label="Cut 224x224 patches\\n(no resizing)"]; clip [label="CLIP ViT-L/14\\n(frozen, 768 features)", fillcolor="#E0F2F1", color="#00897B"];
-  head [label="Classifier head\\n(logistic regression)", fillcolor="#E0F2F1", color="#00897B"];
-  score [label="Trust Score\\n= 100 x (1 - p)"]; out [label="Verdict + heatmap\\n+ explanation"];
-  fft [label="FFT spectrum, ELA,\\nmetadata (no training)", fillcolor="#FFF3E0", color="#F2A33A"];
-  up -> std -> crops -> clip -> head -> score -> out; std -> fft -> out;
-}""", width="stretch")
-    st.markdown("""
-**1. Standardise the file.** Any format (JPG, PNG, WEBP, HEIC...) is converted to plain RGB pixels, so the model never
-sees the file format — only the picture.
-
-**2. Cut patches.** The image is cut into 224 x 224 pixel patches at its own resolution (resizing would blur away the
-tiny traces AI generators leave).
-
-**3. CLIP features.** Each patch goes through CLIP ViT-L/14, a model pre-trained on about 400 million images. We keep it
-**frozen** (we never change it), so it cannot memorise the quirks of one generator. It outputs 768 numbers per patch.
-
-**4. Classifier head.** A single linear layer (logistic regression) turns those numbers into a probability that the
-patch is AI-generated. You can choose the head in the sidebar:
-- **Our model v2** (default): trained on real photos vs many generators — but **never** on any OpenAI (ChatGPT, DALL-E)
-  or Google (Gemini, Imagen, Veo) image, so those stay unseen.
-- **Our model v1**: trained on real photos vs **one** generator only (Stable Diffusion 1.5) — the pure experiment.
-- **UniversalFakeDetect**: a published model (CVPR 2023) trained on ProGAN only.
-
-**5. Trust Score.** The patch scores are averaged: Trust Score = 100 x (1 - probability). 65 or more = Likely Authentic,
-35 or less = Likely AI-generated, in between = Needs Human Review (provisional thresholds).
-
-**6. Evidence.** The heatmap shows which patches look most AI-like; the frequency spectrum, Error Level Analysis and
-metadata are extra evidence that need no training.
-
-**Why can a model trained on one generator catch another?** It does not learn "what Stable Diffusion images look like";
-it learns traces that many generators share — they all build pixels with neural up-sampling and none has a real camera's
-lens and sensor noise — and what real photos look like, which does not change when a new AI tool appears.
-The **Cross-Generator Test** page measures how well this works, generator by generator.
-""")
-
-
-pg = st.navigation([
-    st.Page(page_check, title="Check an image", icon="🔍", default=True),
-    st.Page(page_crossgen, title="Cross-Generator Test", icon="🧪"),
-    st.Page(page_how, title="How it works", icon="ℹ️"),
-], position="top")
-pg.run()
+with tab_tech:
+    st.write(f"**Model:** {result.head.name}  \n**Trained on:** {result.head.trained_on}")
+    st.write(f"**Mean logit:** {result.logit:.3f} → probability = {result.probability:.3f}  \n"
+             f"**Centre patch probability:** {result.center_probability:.3f}  \n"
+             f"**Trust Score** = round(100 × (1 − {result.probability:.3f})) = {score}")
+    st.write("Patch probabilities (3 × 3 grid):")
+    st.dataframe(pd.DataFrame(np.round(result.grid, 3)), width="content")
