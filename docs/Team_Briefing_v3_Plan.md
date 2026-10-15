@@ -4,6 +4,8 @@
 >
 > Read this once, top to bottom. It replaces the chat history Pawan had with Claude (that history was lost when the laptop was cleaned). Everything decided so far is here, plus what each of us does next.
 
+> **Status update, 15 Oct 2026:** v3 is **built, trained, tested and live** at https://deepfake-detector-perceptrons.streamlit.app (default model "Our model v3"). On held-out data it catches 89% of ChatGPT (GPT-Image-1.5) and 94% of Gemini (Nano Banana Pro) images, up from 70% and 66% with the old v2; compressed AI images went from 14% to 66% caught. Full numbers: `docs/walkthroughs/02_v3_work_log.md`. **What is still open:** testing on your own ChatGPT/Gemini edited photos (Task A below), the finer heatmap, the API for the frontend (Task B), and the hosting decision. Sections 4 and 8 below describe the plan as it was on 14 Oct.
+
 ---
 
 ## 1. The project in 60 seconds
