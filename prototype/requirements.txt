@@ -1,4 +1,4 @@
-# Image prototype (Phase 1) — install with:  pip install -r prototype/requirements.txt
+# Image prototype (Phase 1) — install with:  pip install -r prototype/requirements.txt   (models v3, 15 Oct 2026)
 # The extra index gives the small CPU-only PyTorch build (no GPU needed; much smaller download on Linux servers)
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch>=2.2            # deep learning framework
