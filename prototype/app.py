@@ -33,15 +33,15 @@ def get_detector() -> Detector:
 def model_picker() -> str:
     det = get_detector()
     keys = list(det.heads)
-    default = next((keys.index(k) for k in ("ours_v2", "ours") if k in keys), 0)
+    default = next((keys.index(k) for k in ("ours_v3", "ours_v2", "ours") if k in keys), 0)
     key = st.sidebar.selectbox("Detector model", keys, index=default,
                                format_func=lambda k: det.heads[k].name)
     st.sidebar.caption(f"Trained on: {det.heads[key].trained_on}")
     return key
 
 
-def score_card(score: int, p_fake: float) -> None:
-    v = verdict(score)
+def score_card(score: int, p_fake: float, bands=None) -> None:
+    v = verdict(score, bands)
     st.markdown(
         f"""
 <div style="border:2px solid {v.colour}; border-radius:14px; padding:18px 22px; background:{v.colour}14;">
@@ -92,7 +92,7 @@ def page_check() -> None:
     with left:
         st.image(loaded.rgb, caption=f"{name} · {meta['format']} · {meta['size']} px", width="stretch")
     with right:
-        score_card(score, result.probability)
+        score_card(score, result.probability, result.head.bands)
         st.markdown("#### Why?")
         for line in explain(result.probability, result.grid, peak, meta):
             st.markdown(f"- {line}")
@@ -146,11 +146,80 @@ def page_check() -> None:
 # ============================================================================
 # Page 2 - Cross-Generator Test
 # ============================================================================
+V3_RESULTS = HERE / "results" / "v3_results.json"
+V3_CALIBRATION = HERE / "results" / "v3_calibration.json"
+
+
+def v3_section() -> None:
+    """Results of the v3 experiment (held-out OpenFake test split: generators never used in training)."""
+    if not V3_RESULTS.exists():
+        return
+    r = json.loads(V3_RESULTS.read_text(encoding="utf-8"))
+    names = {"v2_reference": "Old v2", "v3_noaug": "v3 without compression training",
+             "v3_proof": "v3 proof (no OpenAI / Google in training)", "v3": "Our model v3"}
+    st.header("Model v3 - results on held-out data")
+    st.write("v3 was trained on many more generators (including ChatGPT and Gemini images) and with random JPEG compression, "
+             "resizing and blur. To keep the claim honest, **the \"proof\" model has every OpenAI and Google image removed from "
+             "training**, and all numbers below come from images **never used in training** (OpenFake test split: "
+             "1,200 real photos and 2,192 AI images from 20 generators that are not in the training set).")
+    rows = []
+    for key, label in names.items():
+        row = {"Model": label}
+        for var, col in (("clean", "Clean"), ("jpeg70", "JPEG 70"), ("half_q75", "Half size + JPEG 75")):
+            e = r[key]["test_openfake"].get(var)
+            row[col] = f"AUC {e['auc']:.3f} · {e['fake_caught'] * 100:.0f}% caught" if e else "-"
+        e = r[key]["test_reddit"].get("clean")
+        row["In the wild (Reddit)"] = f"AUC {e['auc']:.3f} · {e['fake_caught'] * 100:.0f}% caught" if e else "-"
+        row["Real photos called real"] = f"{r[key]['test_openfake']['clean']['real_correct'] * 100:.0f}%"
+        rows.append(row)
+    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+    st.caption("AUC = how well the model separates AI images from real photos (0.5 = guessing, 1.0 = perfect). "
+               "% caught = AI images labelled AI at probability 0.5. JPEG 70 / half size = the same images after compression.")
+
+    st.write("**ChatGPT, Gemini and other modern generators (clean images):**")
+    gens = [("gpt-image-1.5", "GPT-Image-1.5 (ChatGPT)"), ("gpt-image-2", "GPT-Image-2 (ChatGPT)"),
+            ("nano-banana-pro", "Nano Banana Pro (Gemini)"), ("veo-3", "Veo 3 (Google video)"), ("sora-2", "Sora 2 (OpenAI video)"),
+            ("midjourney-7", "Midjourney v7"), ("flux.2-klein-9b", "FLUX.2 klein 9B"), ("z-image-turbo", "Z-Image Turbo")]
+    rows = []
+    for key, label in gens:
+        g = r["v3"]["test_openfake"]["clean"]["per_generator"].get(key)
+        if not g:
+            continue
+        row = {"Generator": label, "Images": g["n"]}
+        for mk, col in (("v2_reference", "Old v2"), ("v3_proof", "v3 proof"), ("v3", "v3")):
+            x = r[mk]["test_openfake"]["clean"]["per_generator"].get(key)
+            row[col] = f"AUC {x['auc']:.3f} · {x['caught'] * 100:.0f}%" if x else "-"
+        rows.append(row)
+    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+    st.caption("In the test split these generators are not in the training set (v3 saw only older versions, for example "
+               "GPT-Image-1 and Imagen; the proof model saw no OpenAI or Google image at all).")
+
+    if V3_CALIBRATION.exists():
+        c = json.loads(V3_CALIBRATION.read_text(encoding="utf-8"))
+        t = c["test_openfake"]["clean"]
+        st.info(f"**Verdict bands (chosen on validation data, not guessed):** Trust Score {c['trust_authentic_at_or_above']} or more = "
+                f"Likely Authentic · {c['trust_ai_at_or_below']} or less = Likely AI-generated · in between = Needs Human Review. "
+                f"On the held-out test split, {t['real']['ai'] * 100:.1f}% of real photos are called AI and "
+                f"{t['fake']['authentic'] * 100:.1f}% of clean AI images are called authentic.")
+    with st.expander("Honest limitations of v3"):
+        st.markdown(chr(10).join([
+            "- Compressed AI images are still the hardest case: at JPEG quality 70 about a third are still missed "
+            "(the model more often says *Needs Human Review* than makes a wrong call).",
+            "- Real photos can land in *Needs Human Review* (roughly 12% on the clean test photos).",
+            "- Edited images: on held-out edits from research datasets the model catches 89% (clean) / 80% (compressed) of "
+            "edited patches, but we have **not** yet measured edits made by ChatGPT or Gemini on real photos.",
+            "- The heatmap is still coarse (3 x 3 patches).",
+        ]))
+    st.divider()
+    st.header("Original prototype experiment (models v1 and v2)")
+
+
 def page_crossgen() -> None:
     st.title("🧪 Cross-Generator Test")
     st.write("**Cross-generator generalization** means the detector still works on images from AI tools it "
              "**never saw during training**. We train on some generators and test on others it has never seen.")
 
+    v3_section()
     if RESULTS_FILE.exists():
         res = json.loads(RESULTS_FILE.read_text())
         df = pd.DataFrame(res["rows"])
@@ -295,13 +364,19 @@ tiny traces AI generators leave).
 
 **4. Classifier head.** A single linear layer (logistic regression) turns those numbers into a probability that the
 patch is AI-generated. You can choose the head in the sidebar:
-- **Our model v2** (default): trained on real photos vs many generators — but **never** on any OpenAI (ChatGPT, DALL-E)
+- **Our model v3** (default): our strongest model. Trained on real photos vs many generators **including ChatGPT and Gemini
+  images**, with random compression / resizing / blur during training, and with edited-image patches. Probabilities are
+  calibrated and the verdict bands are chosen on validation data.
+- **v3 proof** and **v3 no-augmentation**: the same recipe with all OpenAI/Google images removed (cross-generator proof),
+  and without compression training (shows what that training buys).
+- **Our model v2**: trained on real photos vs many generators — but **never** on any OpenAI (ChatGPT, DALL-E)
   or Google (Gemini, Imagen, Veo) image, so those stay unseen.
 - **Our model v1**: trained on real photos vs **one** generator only (Stable Diffusion 1.5) — the pure experiment.
 - **UniversalFakeDetect**: a published model (CVPR 2023) trained on ProGAN only.
 
-**5. Trust Score.** The patch scores are averaged: Trust Score = 100 x (1 - probability). 65 or more = Likely Authentic,
-35 or less = Likely AI-generated, in between = Needs Human Review (provisional thresholds).
+**5. Trust Score.** The patch scores are averaged: Trust Score = 100 x (1 - probability). for model v3 the bands come from validation data
+(see the Technical details tab: Likely Authentic from 54, Likely AI-generated up to 17, in between = Needs Human Review).
+Older models use provisional bands (65 / 35).
 
 **6. Evidence.** The heatmap shows which patches look most AI-like; the frequency spectrum, Error Level Analysis and
 metadata are extra evidence that need no training.

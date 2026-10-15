@@ -1,0 +1,16 @@
+{
+ "name": "Our model v3 (strongest)",
+ "trained_on": "real photos vs ~60 generators incl. ChatGPT (GPT-Image-1, DALL-E 3) and Gemini/Google (Imagen, Nano Banana) images, with random compression / resize / blur during training, plus AI-edited image patches. About 30,000 images, calibrated on validation data",
+ "normalize_features": true,
+ "use_frequency": false,
+ "jpeg_quality": 95,
+ "regularization_C": 1.0,
+ "variant": "v3",
+ "held_out": [],
+ "calibration": {
+  "a": 1.513440489768982,
+  "b": 0.7216918468475342,
+  "p_ai": 0.8274760842323303,
+  "p_real": 0.45637983083724976
+ }
+}

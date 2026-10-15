@@ -8,7 +8,11 @@ How an image is scored
      probability that the patch is AI-generated.
   4. Image score = sigmoid(mean of patch logits). The grid of patch scores is the heatmap.
 
-Three heads are available (all share the same frozen CLIP encoder):
+Heads (all share the same frozen CLIP encoder):
+  - "ours_v3":       our strongest head (many generators incl. ChatGPT + Gemini, compression augmentation,
+                     edited-image patches; calibrated on validation data) - default in the app
+  - "ours_v3_proof": the v3 recipe with every OpenAI and Google image removed (cross-generator proof)
+  - "ours_v3_noaug": the v3 recipe without compression augmentation (ablation)
   - "ours_v2": our head trained on many generators, but never on ChatGPT's or Gemini's (default in the app)
   - "ours":    our head trained on ONE generator only (SD1.5) - the pure cross-generator experiment
   - "ufd":     UniversalFakeDetect (Ojha et al., CVPR 2023), trained only on ProGAN images
@@ -125,7 +129,20 @@ class Head:
     jpeg_quality: int | None = None       # re-save patches as JPEG before scoring
     freq_mean: np.ndarray | None = None
     freq_std: np.ndarray | None = None
+    calibration: dict | None = None       # Platt scaling a, b and verdict bands, chosen on validation data (v3)
     info: dict = field(default_factory=dict)
+
+    def calibrated(self, logit):
+        """Probability of AI. v3 heads use Platt scaling fitted on the validation split; older heads use sigmoid."""
+        if self.calibration:
+            return sigmoid(self.calibration["a"] * np.asarray(logit, dtype=np.float64) + self.calibration["b"])
+        return sigmoid(logit)
+
+    @property
+    def bands(self) -> tuple[int, int] | None:
+        """(Trust Score at or above = Authentic, at or below = AI-generated), chosen on validation data."""
+        c = self.calibration
+        return (round(100 * (1 - c["p_real"])), round(100 * (1 - c["p_ai"]))) if c else None
 
     def prepare(self, patch: Image.Image) -> Image.Image:
         return jpeg_normalize(patch, self.jpeg_quality) if self.jpeg_quality else patch
@@ -169,6 +186,7 @@ def load_our_head(stem: str = "our_head", key: str = "ours") -> Head | None:
         jpeg_quality=meta.get("jpeg_quality"),
         freq_mean=data["freq_mean"] if meta["use_frequency"] else None,
         freq_std=data["freq_std"] if meta["use_frequency"] else None,
+        calibration=meta.get("calibration"),
         info=meta,
     )
 
@@ -194,7 +212,8 @@ class Detector:
     def __init__(self, device: str = "cpu"):
         self.encoder = ClipEncoder(device)
         self.heads: dict[str, Head] = {}
-        for stem, key in (("our_head_v2", "ours_v2"), ("our_head", "ours")):
+        for stem, key in (("our_head_v3", "ours_v3"), ("our_head_v3_proof", "ours_v3_proof"),
+                          ("our_head_v3_noaug", "ours_v3_noaug"), ("our_head_v2", "ours_v2"), ("our_head", "ours")):
             head = load_our_head(stem, key)
             if head is not None:
                 self.heads[key] = head
@@ -207,11 +226,11 @@ class Detector:
         patches = [center_crop(img)] + [img.crop(b) for b in boxes]
         patches = [head.prepare(p) for p in patches]
         logits = head.logits(self.encoder.encode(patches), patches)
-        probs = sigmoid(logits)
+        probs = head.calibrated(logits)
         mean_logit = float(np.mean(logits))
         return DetectionResult(
             head=head,
-            probability=float(sigmoid(mean_logit)),
+            probability=float(head.calibrated(mean_logit)),
             logit=mean_logit,
             grid=probs[1:].reshape(grid, grid),
             boxes=boxes,

@@ -1,0 +1,12 @@
+{
+ "name": "Our model v3 - proof (no OpenAI/Google)",
+ "trained_on": "the v3 recipe with every OpenAI and Google image removed, so ChatGPT and Gemini are unseen: the cross-generator proof model",
+ "normalize_features": true,
+ "use_frequency": false,
+ "jpeg_quality": 95,
+ "regularization_C": 3.0,
+ "variant": "v3_proof",
+ "held_out": [
+  "all OpenAI and Google models"
+ ]
+}

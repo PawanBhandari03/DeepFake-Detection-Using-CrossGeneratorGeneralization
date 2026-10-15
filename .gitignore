@@ -8,3 +8,8 @@ data/
 
 # Generated PDFs (kept only for sharing)
 *.pdf
+
+# Kaggle run outputs (large, re-downloadable with: kaggle kernels output <kernel> -p <dir>)
+kaggle/**/out/
+kaggle/**/out2/
+kaggle/**/partial/

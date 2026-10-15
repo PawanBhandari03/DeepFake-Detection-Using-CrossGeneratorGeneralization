@@ -29,10 +29,12 @@ def trust_score(p_fake: float) -> int:
     return int(round(100 * (1 - p_fake)))
 
 
-def verdict(score: int) -> Verdict:
-    if score >= AUTHENTIC_AT_OR_ABOVE:
+def verdict(score: int, bands: tuple[int, int] | None = None) -> Verdict:
+    """bands = (authentic_at_or_above, ai_at_or_below); v3 bands are chosen on validation data."""
+    authentic_at, ai_at = bands or (AUTHENTIC_AT_OR_ABOVE, MANIPULATED_AT_OR_BELOW)
+    if score >= authentic_at:
         return Verdict("Likely Authentic", "#3A9D5D", "No strong signs of AI generation were found.")
-    if score <= MANIPULATED_AT_OR_BELOW:
+    if score <= ai_at:
         return Verdict("Likely AI-generated / Manipulated", "#D84343", "Strong signs of AI generation were found.")
     return Verdict("Needs Human Review", "#F2A33A", "The evidence is mixed; a person should check this image.")
 

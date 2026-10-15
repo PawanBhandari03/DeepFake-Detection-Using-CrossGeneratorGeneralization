@@ -4,7 +4,7 @@
 >
 > **Guide:** Dr. Gayatri Bhandari (HOD) · **College:** JSPM's BSIOTR, Wagholi, Pune · BE Computer Engineering
 >
-> **Last updated:** 2026-09-27
+> **Last updated:** 2026-10-14
 
 This file is our single source of truth. Every week we tick the boxes, fill the weekly log, and use it to report to our supervisor.
 
@@ -12,11 +12,15 @@ This file is our single source of truth. Every week we tick the boxes, fill the 
 
 | Document | Source |
 |---|---|
+| **Team Briefing — v3 plan and tasks** (14 Oct) | [docs/Team_Briefing_v3_Plan.md](docs/Team_Briefing_v3_Plan.md) |
+| **Walkthrough 02 — v3 work log** (what we did, step by step) | [docs/walkthroughs/02_v3_work_log.md](docs/walkthroughs/02_v3_work_log.md) |
 | This roadmap | `PROJECT_ROADMAP.md` |
 | Project overview and algorithms (4 pages) | [docs/Overview_and_Algorithms.tex](docs/Overview_and_Algorithms.tex) |
 | Full system design: architecture, algorithms, UML/DFD diagrams (31 pages) | [docs/System_Design.tex](docs/System_Design.tex) |
 | Review-III questions and answers | [docs/Review3_QA.md](docs/Review3_QA.md) |
 | Quick answers cheat sheet (1–3 line answers) | [docs/Quick_Answers.md](docs/Quick_Answers.md) |
+| SRS (IEEE 830) | [docs/SRS.md](docs/SRS.md) |
+| Review-III presentation (16 slides) | [docs/presentations/Review3_Requirement_Analysis.pptx](docs/presentations/Review3_Requirement_Analysis.pptx) |
 | **Walkthrough 01 — Image prototype** (what we built, how it works, datasets, results) | [docs/walkthroughs/01_image_prototype.md](docs/walkthroughs/01_image_prototype.md) |
 
 **Code:** [prototype/](prototype/) — the image prototype web app (run: `.venv\Scripts\streamlit run prototype\app.py`).
@@ -29,10 +33,10 @@ To make a PDF for sharing: `python docs/tools/md2pdf.py <file>.md` for Markdown 
 
 | | |
 |---|---|
-| **Current phase** | Phase 1 — Image (started early: first prototype built) |
-| **Current week** | Week 1 · Sep 28 – Oct 4, 2026 · Setup and learning |
-| **Next milestone** | Prototype submission — Mon 28 Sept 2026 (teacher's request); then Phase 1 demo — Week 11 |
-| **Blocked on** | Nothing |
+| **Current phase** | Phase 1 — Image (prototype v1/v2 built; **v3 in progress** — see [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md)) |
+| **Current week** | Week 3 · Oct 12 – Oct 18, 2026 · v3: stronger data, JPEG augmentation, edited-image handling |
+| **Next milestone** | Review demo in about 1–2 weeks (v3 + team test images); then Phase 1 demo — Week 11 |
+| **Blocked on** | Nothing. Waiting for the team's test images (Task A in the [Team Briefing](docs/Team_Briefing_v3_Plan.md)) to measure real-world edited photos |
 
 > **Change to the plan (27 Sept):** the teacher asked for a working prototype by Mon 28 Sept, so a first version of the Week 11 app was built early — see [Walkthrough 01](docs/walkthroughs/01_image_prototype.md). It already covers parts of Weeks 1–5 (environment, data, evaluation script, CLIP model, cross-generator test). The weekly plan below stays; those weeks now **improve** the prototype instead of starting from zero.
 
@@ -54,6 +58,7 @@ We build it in three phases, one at a time. Each phase ends with a working demo.
 
 ## 2. How we work
 
+- **Checkbox key:** `[x]` done and checked · `[~]` partly done · `[ ]` not started.
 - **One phase at a time.** We finish and demo a phase before starting the next.
 - **One small goal per week.** Each week has a "Show supervisor" line: that is what we report.
 - **Every week:** tick the boxes below, add an entry to the [Weekly log](#11-weekly-log), push code to GitHub.
@@ -148,7 +153,7 @@ Some datasets need a form or email and can take weeks to approve. Request everyt
 **What we measure:** accuracy, AUC, precision, recall, F1 — for **each generator separately**.
 
 ### Week 1 · Sep 28 – Oct 4 · Setup and learning
-- [ ] Create the shared GitHub repo and a shared Google Drive folder
+- [x] Create the shared GitHub repo *(done; Google Drive folder: not confirmed)*
 - [ ] Everyone runs one PyTorch beginner tutorial (train a small image classifier) on Colab
 - [ ] Send all dataset access requests from [Section 5](#datasets--send-access-requests-in-week-1)
 - [ ] Everyone reads two papers: *UniversalFakeDetect* (CLIP for fake detection) and *Fake or JPEG?* (dataset bias)
@@ -179,29 +184,29 @@ Some datasets need a form or email and can take weeks to approve. Request everyt
 **Show supervisor:** first per-generator results table — seen vs unseen gap.
 
 ### Week 5 · Oct 26 – Nov 1 · Main model v1: CLIP features
-- [ ] Extract CLIP image features once and save them to disk (`.npy`)
-- [ ] Train a simple classifier (logistic regression) on the saved features
-- [ ] Tip: **center-crop** images instead of resizing them — resizing blurs away the tiny artifacts we want to detect
+- [x] Extract CLIP image features once and save them to disk (`.npy`) *(done in the prototype: `data/features/*.npz`; v3 repeats this on Kaggle)*
+- [x] Train a simple classifier (logistic regression) on the saved features *(v1, v2)*
+- [x] Tip: **center-crop** images instead of resizing them — resizing blurs away the tiny artifacts we want to detect
 - [ ] Test on all 8 generators and compare with EfficientNet
 
 **Show supervisor:** EfficientNet vs CLIP comparison table.
 
 ### Week 6 · Nov 2 – Nov 8 · Remove dataset shortcuts
-- [ ] Re-save all real and fake images the same way (same format and JPEG quality, same crop size)
-- [ ] Add random JPEG compression during training
-- [ ] Retrain both models and compare before vs after
+- [x] Re-save all real and fake images the same way (same format and JPEG quality, same crop size) *(JPEG q95 patch normalisation, prototype)*
+- [x] Add random JPEG compression during training *(v3: random resize / blur / JPEG 50–95 on a second view of every training image)*
+- [x] Retrain both models and compare before vs after *(v3 vs v3 without augmentation, [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md) Entry 10; EfficientNet not retrained)*
 
 **Show supervisor:** before/after table — proof the model learns real artifacts, not file-format tricks.
 
 ### Week 7 · Nov 9 – Nov 15 · Forensic evidence: frequency and noise
-- [ ] Compute noise residuals (image minus a smoothed copy) and their **FFT spectrum**
+- [x] Compute noise residuals (image minus a smoothed copy) and their **FFT spectrum** *(prototype)*
 - [ ] Plot the average spectrum for real images and each generator — look for grid-like peaks
-- [ ] Try adding these frequency features to the CLIP classifier; does it help on unseen generators?
+- [x] Try adding these frequency features to the CLIP classifier; does it help on unseen generators? *(result: no measurable gain, AUC 0.89 with vs 0.90 without)*
 
 **Show supervisor:** spectrum figures (real vs each generator) + whether fusion helped.
 
 ### Week 8 · Nov 16 – Nov 22 · Robustness tests
-- [ ] Test the best model on images after: JPEG quality 90 / 70 / 50, resize to half, blur, a screenshot-like re-save
+- [~] Test the best model on images after: JPEG quality 90 / 70 / 50, resize to half, blur, a screenshot-like re-save *(done: JPEG 70 and half size + JPEG 75, plus in-the-wild Reddit images; other levels not yet)*
 - [ ] Plot accuracy vs each change (robustness curve)
 
 **Show supervisor:** robustness curves — how the model behaves on "real-world" shared images.
@@ -209,20 +214,20 @@ Some datasets need a form or email and can take weeks to approve. Request everyt
 ### Week 9 · Nov 23 – Nov 29 · Our own 2026 unseen test set
 - [ ] Generate 500–1000 images on Colab with newer open models (for example SDXL / SD 3.5 class) using COCO captions as prompts
 - [ ] Use the matching real COCO images as the "real" side
-- [ ] Test our model on this set — generators newer than anything in training
+- [ ] Test our model on this set — generators newer than anything in training *(v3 plan: OpenFake held-out test split + team ChatGPT/Gemini photos)*
 
 **Show supervisor:** results on our own 2026 test set (this is an original contribution).
 
 ### Week 10 · Nov 30 – Dec 6 · Explanations and calibrated Trust Score
-- [ ] Heatmaps: Grad-CAM on EfficientNet; a patch-level score map for the CLIP model (score small crops of the image)
-- [ ] Calibrate the model's probability on the validation set (temperature / Platt scaling); plot a reliability diagram
-- [ ] Turn it into a 0–100 Trust Score and choose the three verdict bands using validation data (not guessed numbers)
-- [ ] Write template sentences for the plain-language explanation
+- [~] Heatmaps: Grad-CAM on EfficientNet; a patch-level score map for the CLIP model (score small crops of the image) *(3×3 patch map done; finer grid planned in v3)*
+- [~] Calibrate the model's probability on the validation set (temperature / Platt scaling); plot a reliability diagram *(Platt scaling done for v3; reliability diagram not plotted yet)*
+- [x] Turn it into a 0–100 Trust Score and choose the three verdict bands using validation data (not guessed numbers) *(v3: Authentic ≥ 54, AI-generated ≤ 17; `prototype/calibrate_v3.py`)*
+- [x] Write template sentences for the plain-language explanation *(`prototype/trust.py`)*
 
 **Show supervisor:** heatmaps, calibration plot, verdict bands.
 
 ### Week 11 · Dec 7 – Dec 13 · Phase 1 demo ⭐ Milestone
-- [ ] Streamlit app v1: upload image → Trust Score, verdict, heatmap, frequency plot, explanation
+- [x] Streamlit app v1: upload image → Trust Score, verdict, heatmap, frequency plot, explanation *(prototype; to be updated with v3)*
 - [ ] Write a 2–3 page Phase 1 summary (method, results tables, limitations)
 - [ ] Fill in the Phase 1 section of the [Results board](#9-results-board)
 
@@ -375,6 +380,17 @@ Fill these in as experiments finish. Use `—` for "not run yet".
 | CLIP + classifier (debiased) | — | — | — | — | — | — | — | — | — | — |
 | CLIP + frequency features | — | — | — | — | — | — | — | — | — | — |
 
+### Phase 1 — v3 results (image-level AUC / % of AI images caught; held-out OpenFake test split, 1,200 real + 2,192 AI images; v3 = ours, trained 14 Oct)
+
+| Model | Clean | JPEG 70 | Half size + JPEG 75 | In-the-wild (Reddit) | ChatGPT GPT-Image-1.5 | Gemini Nano Banana Pro | Real photos called real (clean) |
+|---|---|---|---|---|---|---|---|
+| v2 (old) | 0.947 / 81% | 0.839 / 14% | 0.705 / 50% | 0.876 / 36% | 0.918 / 70% | 0.923 / 66% | 94% |
+| v3, no compression training | 0.985 / 93% | 0.949 / 53% | 0.929 / 76% | 0.951 / 75% | 0.975 / 90% | — | 95% |
+| **v3 proof** (no OpenAI/Google in training) | 0.977 / 92% | 0.936 / 62% | 0.935 / 85% | 0.940 / 73% | 0.957 / 84% | 0.984 / 98% | 93% |
+| **v3** (demo model) | **0.982 / 94%** | **0.949 / 66%** | **0.950 / 86%** | **0.937 / 73%** | **0.972 / 89%** | **0.985 / 94%** | 93% |
+
+"Caught" = labelled AI at probability 0.5. Details, per-generator tables and caveats: [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md). Edited-image detection and the team's own test images are still to be measured.
+
 ### Phase 2 — Video (video-level AUC)
 
 | Model | FaceForensics++ (seen) | Celeb-DF v2 (unseen) |
@@ -422,6 +438,16 @@ Copy this block for each week.
 - Problems / blockers: DocTamper and FaceForensics++ need access requests. The Tiny-GenImage copy has no SD1.4, so we train on SD1.5. Laptop has 7.8 GB RAM and no GPU, so data is read in small batches and experiments stay small.
 - Told supervisor: _(fill in after Monday)_
 - Next week: Week 1 — show the prototype; setup, dataset requests, first two papers.
+
+### Week 1–2 · Sep 28 – Oct 11, 2026 · Partly done
+- Done: Showed the prototype to the teacher. Feedback: weak on new ChatGPT / Gemini images and on partly edited real photos.
+- Results: see Walkthrough 01. No new experiments in these weeks.
+- Problems / blockers: Laptop cleaned, chat history lost (rebuilt from the repo on 13 Oct).
+
+### Week 3 · Oct 12 – Oct 18, 2026 · In progress
+- Done (13–14 Oct): decided the v3 plan (demo model + proof model, JPEG augmentation, finer heatmap, edited-image data); checked datasets (DiffSeg30k, tiny-audits, full OpenFake layout); wrote the [Team Briefing](docs/Team_Briefing_v3_Plan.md) and started [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md) (running log). Roadmap items already covered by the prototype ticked.
+- Done (14 Oct, later): Kaggle feature extraction finished (414k patches); trained v3, v3-proof and v3-no-augmentation; calibrated v3 and chose verdict bands on validation data; added v3 to the app as the default model. Results in the Results board below and in Walkthrough 02 (Entries 9–12).
+- Next: test on the team's own ChatGPT/Gemini photos (waiting for Task A), finer heatmap and region-based verdict, update the cross-generator page and slides.
 
 ---
 

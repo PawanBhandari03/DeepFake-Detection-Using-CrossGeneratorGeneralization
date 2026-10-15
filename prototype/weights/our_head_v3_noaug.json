@@ -1,0 +1,10 @@
+{
+ "name": "Our model v3 - no compression training",
+ "trained_on": "the v3 recipe on clean images only (no random compression / resize / blur): shows what that training adds",
+ "normalize_features": true,
+ "use_frequency": false,
+ "jpeg_quality": 95,
+ "regularization_C": 0.3,
+ "variant": "v3_noaug",
+ "held_out": []
+}
