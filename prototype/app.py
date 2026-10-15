@@ -26,7 +26,9 @@ st.set_page_config(page_title="Content Authenticity Checker", page_icon="🛡️
 
 
 @st.cache_resource(show_spinner="Loading the AI detector (first time only, about 30 seconds)...")
-def get_detector() -> Detector:
+def get_detector(models_version: str = "2026-10-15-v3") -> Detector:
+    # Changing this version string (it is part of the cache key) makes a running app reload the model heads,
+    # for example after new weights are pushed. Without it a hosted app keeps serving the old heads.
     return Detector()
 
 
