@@ -236,3 +236,10 @@ class Detector:
             boxes=boxes,
             center_probability=float(probs[0]),
         )
+
+    def fine_grid(self, img: Image.Image, head_key: str, n: int = 6) -> np.ndarray:
+        """n x n map of patch probabilities for a finer heatmap (display only; the verdict still uses analyze())."""
+        head = self.heads[head_key]
+        img = ensure_min_size(img)
+        patches = [head.prepare(img.crop(b)) for b in grid_boxes(img.width, img.height, n)]
+        return head.calibrated(head.logits(self.encoder.encode(patches), patches)).reshape(n, n)

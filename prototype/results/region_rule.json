@@ -1,0 +1,107 @@
+{
+ "flag_share_of_authentic_validation_real": 0.1,
+ "threshold_mean_plus_max_logit": -0.07639790773391664,
+ "authentic_at_or_above": 54,
+ "test": {
+  "clean/real": {
+   "n": 1200,
+   "authentic_before": 0.86,
+   "sent_to_review": 0.073,
+   "authentic_after": 0.787
+  },
+  "clean/ai": {
+   "n": 2192,
+   "authentic_before": 0.026,
+   "sent_to_review": 0.009,
+   "authentic_after": 0.017
+  },
+  "half_q75/real": {
+   "n": 1200,
+   "authentic_before": 0.794,
+   "sent_to_review": 0.045,
+   "authentic_after": 0.749
+  },
+  "half_q75/ai": {
+   "n": 2192,
+   "authentic_before": 0.072,
+   "sent_to_review": 0.025,
+   "authentic_after": 0.047
+  },
+  "jpeg70/real": {
+   "n": 1200,
+   "authentic_before": 0.929,
+   "sent_to_review": 0.045,
+   "authentic_after": 0.884
+  },
+  "jpeg70/ai": {
+   "n": 2192,
+   "authentic_before": 0.193,
+   "sent_to_review": 0.082,
+   "authentic_after": 0.111
+  }
+ },
+ "reddit": {
+  "clean/real": {
+   "n": 738,
+   "authentic_before": 0.844,
+   "sent_to_review": 0.088,
+   "authentic_after": 0.756
+  },
+  "clean/ai": {
+   "n": 3121,
+   "authentic_before": 0.119,
+   "sent_to_review": 0.053,
+   "authentic_after": 0.066
+  }
+ },
+ "edited_heldout": {
+  "clean/real": {
+   "n": 323,
+   "authentic_before": 0.786,
+   "sent_to_review": 0.105,
+   "authentic_after": 0.681
+  },
+  "clean/ai": {
+   "n": 764,
+   "authentic_before": 0.308,
+   "sent_to_review": 0.09,
+   "authentic_after": 0.217
+  },
+  "clean/edited": {
+   "n": 764,
+   "authentic_before": 0.308,
+   "sent_to_review": 0.09,
+   "authentic_after": 0.217
+  },
+  "clean/orig": {
+   "n": 323,
+   "authentic_before": 0.786,
+   "sent_to_review": 0.105,
+   "authentic_after": 0.681
+  },
+  "jpeg70/real": {
+   "n": 323,
+   "authentic_before": 0.882,
+   "sent_to_review": 0.071,
+   "authentic_after": 0.811
+  },
+  "jpeg70/ai": {
+   "n": 764,
+   "authentic_before": 0.482,
+   "sent_to_review": 0.113,
+   "authentic_after": 0.369
+  },
+  "jpeg70/edited": {
+   "n": 764,
+   "authentic_before": 0.482,
+   "sent_to_review": 0.113,
+   "authentic_after": 0.369
+  },
+  "jpeg70/orig": {
+   "n": 323,
+   "authentic_before": 0.882,
+   "sent_to_review": 0.071,
+   "authentic_after": 0.811
+  }
+ }
+}

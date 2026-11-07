@@ -26,7 +26,7 @@ st.set_page_config(page_title="Content Authenticity Checker", page_icon="🛡️
 
 
 @st.cache_resource(show_spinner="Loading the AI detector (first time only, about 30 seconds)...")
-def get_detector(models_version: str = "2026-10-15-v3") -> Detector:
+def get_detector(models_version: str = "2026-11-07-v3-fine-heatmap") -> Detector:
     # Changing this version string (it is part of the cache key) makes a running app reload the model heads,
     # for example after new weights are pushed. Without it a hosted app keeps serving the old heads.
     return Detector()
@@ -103,10 +103,14 @@ def page_check() -> None:
     tab_heat, tab_freq, tab_ela, tab_meta, tab_tech = st.tabs(
         ["🔥 Heatmap", "📈 Frequency spectrum", "🔍 Error Level Analysis", "📄 File & metadata", "⚙️ Technical details"])
     with tab_heat:
-        st.image(heatmap_overlay(loaded.rgb, result.grid), width="stretch",
+        fine = st.checkbox("Finer heatmap (6 x 6 patches, about 40 seconds more)", value=False,
+                           help="Scores 36 patches instead of 9. It only changes the picture; the verdict above does not change.")
+        grid_shown = det.fine_grid(loaded.rgb, head_key, 6) if fine else result.grid
+        st.image(heatmap_overlay(loaded.rgb, grid_shown), width="stretch",
                  caption="Red = patches that look AI-generated, green = patches that look real.")
-        st.caption("The image is checked as a 3 x 3 grid of 224 x 224 patches at full resolution, plus the centre. "
-                   "This prototype heatmap is coarse; precise pixel-level maps come later (U-Net, Phase 3).")
+        st.caption(f"The verdict uses a centre patch plus a 3 x 3 grid of 224 x 224 patches at full resolution. "
+                   f"The picture above shows a {grid_shown.shape[0]} x {grid_shown.shape[0]} grid; "
+                   "precise pixel-level maps come later (U-Net, Phase 3).")
     with tab_freq:
         c1, c2 = st.columns(2)
         c1.image(spectrum_image(loaded.rgb), width="stretch",
@@ -210,7 +214,7 @@ def v3_section() -> None:
             "- Real photos can land in *Needs Human Review* (roughly 12% on the clean test photos).",
             "- Edited images: on held-out edits from research datasets the model catches 89% (clean) / 80% (compressed) of "
             "edited patches, but we have **not** yet measured edits made by ChatGPT or Gemini on real photos.",
-            "- The heatmap is still coarse (3 x 3 patches).",
+            "- The default heatmap is coarse (3 x 3 patches); an optional 6 x 6 view is available in the Heatmap tab.",
         ]))
     st.divider()
     st.header("Original prototype experiment (models v1 and v2)")

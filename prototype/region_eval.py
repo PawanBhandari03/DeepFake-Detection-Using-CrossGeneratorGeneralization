@@ -55,10 +55,10 @@ AGG = {
 def image_scores(df):
     """One row per (image, variant) and each aggregation option."""
     out = []
-    for (iid, var), g in df[df.slot >= 0].groupby(["img_id", "variant"]):
+    for (iid, var, kind), g in df[df.slot >= 0].groupby(["img_id", "variant", "kind"]):
         v = g.sort_values("slot").logit.to_numpy()
         row = {"img_id": iid, "variant": var, "src": g.src.iloc[0], "label": int(g.label.iloc[0]),
-               "kind": g.kind.iloc[0] if "kind" in g else "full", "n": len(v)}
+               "kind": kind, "n": len(v)}
         row.update({k: float(f(v)) for k, f in AGG.items()})
         out.append(row)
     return pd.DataFrame(out)
