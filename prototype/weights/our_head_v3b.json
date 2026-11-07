@@ -1,0 +1,16 @@
+{
+ "name": "Our model v3b (v3 + strong resize/blur training)",
+ "trained_on": "the v3 training data plus about 12,000 further OpenFake images with strong resize-only, blur-only and mixed degradations",
+ "normalize_features": true,
+ "use_frequency": false,
+ "jpeg_quality": 95,
+ "regularization_C": 10.0,
+ "variant": "v3b",
+ "calibration": {
+  "a": 1.2096328735351562,
+  "b": 0.6291408538818359,
+  "p_ai": 0.8419995903968811,
+  "p_real": 0.40168026089668274
+ },
+ "held_out": []
+}

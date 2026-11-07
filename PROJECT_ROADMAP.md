@@ -17,10 +17,12 @@ This file is our single source of truth. Every week we tick the boxes, fill the 
 | This roadmap | `PROJECT_ROADMAP.md` |
 | Project overview and algorithms (4 pages) | [docs/Overview_and_Algorithms.tex](docs/Overview_and_Algorithms.tex) |
 | Full system design: architecture, algorithms, UML/DFD diagrams (31 pages) | [docs/System_Design.tex](docs/System_Design.tex) |
-| Review-III questions and answers | [docs/Review3_QA.md](docs/Review3_QA.md) |
-| Quick answers cheat sheet (1–3 line answers) | [docs/Quick_Answers.md](docs/Quick_Answers.md) |
 | SRS (IEEE 830) | [docs/SRS.md](docs/SRS.md) |
-| Review-III presentation (16 slides) | [docs/presentations/Review3_Requirement_Analysis.pptx](docs/presentations/Review3_Requirement_Analysis.pptx) |
+| **Research paper for submission: 4 pages, whole project, focus on the process** (guide's instruction; "With Authors" = with references, "Without Authors" = no references or citation numbers, our names kept in both) | [paper/](paper/) — `Final_Paper_4pages_With_Authors.pdf`, `Final_Paper_4pages_Without_Authors.pdf`; rebuilt by `paper/build_short_paper.py` |
+| Research paper, full project, 6 pages (image + video + document; with / without authors) | [paper/](paper/) — `Full_Research_Paper_With_Authors.pdf`, `Full_Research_Paper_Without_Authors.pdf`; rebuilt by `paper/build_full_paper.py` |
+| Research paper, image part only (with / without authors) | [paper/](paper/) — `Image_Research_Paper_With_Authors.pdf`, `Image_Research_Paper_Without_Authors.pdf`; `paper/build_paper.py` |
+| Originality check of the papers | [paper/Plagiarism_Report.md](paper/Plagiarism_Report.md) |
+| Work summary (what was done in October, accuracy, plan v4) | [docs/Work_Summary_Oct_2026.md](docs/Work_Summary_Oct_2026.md) |
 | **Walkthrough 01 — Image prototype** (what we built, how it works, datasets, results) | [docs/walkthroughs/01_image_prototype.md](docs/walkthroughs/01_image_prototype.md) |
 
 **Code:** [prototype/](prototype/) — the image prototype web app (run: `.venv\Scripts\streamlit run prototype\app.py`).
@@ -163,16 +165,16 @@ Some datasets need a form or email and can take weeks to approve. Request everyt
 
 ### Week 2 · Oct 5 – Oct 11 · Get the image data
 - [ ] Download GenImage subsets: start small (about 10k real + 10k fake from SD v1.4 for training; 1–2k per other generator for testing)
-- [ ] Split into train / validation / test folders
+- [x] Split into train / validation / test folders *(v3 uses the official OpenFake train / validation / held-out test / Reddit splits)*
 - [ ] Write a **data card**: image counts, sizes, and file formats (JPEG vs PNG) for real and fake
 - [ ] Make a grid of sample images (real vs each generator)
 
 **Show supervisor:** data card table + sample image grid.
 
 ### Week 3 · Oct 12 – Oct 18 · Build the evaluation script first
-- [ ] Write `evaluate.py`: takes predictions → prints accuracy, AUC, precision, recall, F1, confusion matrix, and a **per-generator results table**
+- [~] Write `evaluate.py`: takes predictions → prints accuracy, AUC, precision, recall, F1, confusion matrix, and a **per-generator results table**
 - [ ] Test it with random predictions (should give ~50% accuracy, ~0.5 AUC)
-- [ ] Create the results table in the [Results board](#9-results-board)
+- [x] Create the results table in the [Results board](#9-results-board) *(v3 table filled in 14 Oct)*
 
 **Show supervisor:** working evaluation script and empty results table layout.
 
@@ -206,8 +208,8 @@ Some datasets need a form or email and can take weeks to approve. Request everyt
 **Show supervisor:** spectrum figures (real vs each generator) + whether fusion helped.
 
 ### Week 8 · Nov 16 – Nov 22 · Robustness tests
-- [~] Test the best model on images after: JPEG quality 90 / 70 / 50, resize to half, blur, a screenshot-like re-save *(done: JPEG 70 and half size + JPEG 75, plus in-the-wild Reddit images; other levels not yet)*
-- [ ] Plot accuracy vs each change (robustness curve)
+- [x] Test the best model on images after: JPEG quality 90 / 70 / 50, resize to half, blur, a screenshot-like re-save *(done 25 Oct: all seven conditions, see paper/robust_results.json and Walkthrough 02 Entry 17)*
+- [x] Plot accuracy vs each change (robustness curve) *(paper/figures/fig_robust.png)*
 
 **Show supervisor:** robustness curves — how the model behaves on "real-world" shared images.
 
@@ -220,7 +222,7 @@ Some datasets need a form or email and can take weeks to approve. Request everyt
 
 ### Week 10 · Nov 30 – Dec 6 · Explanations and calibrated Trust Score
 - [~] Heatmaps: Grad-CAM on EfficientNet; a patch-level score map for the CLIP model (score small crops of the image) *(3×3 patch map done; finer grid planned in v3)*
-- [~] Calibrate the model's probability on the validation set (temperature / Platt scaling); plot a reliability diagram *(Platt scaling done for v3; reliability diagram not plotted yet)*
+- [x] Calibrate the model's probability on the validation set (temperature / Platt scaling); plot a reliability diagram *(Platt scaling and reliability diagram done for v3)*
 - [x] Turn it into a 0–100 Trust Score and choose the three verdict bands using validation data (not guessed numbers) *(v3: Authentic ≥ 54, AI-generated ≤ 17; `prototype/calibrate_v3.py`)*
 - [x] Write template sentences for the plain-language explanation *(`prototype/trust.py`)*
 

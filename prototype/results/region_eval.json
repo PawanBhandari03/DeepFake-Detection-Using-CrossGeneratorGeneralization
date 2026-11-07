@@ -1,0 +1,122 @@
+{
+ "threshold_from_validation": {
+  "mean": 0.7966243517398831,
+  "max": 2.7038443708419786,
+  "top2": 2.353196704387664,
+  "top3": 2.1276884865760795,
+  "mean+max": 1.5678142416477197
+ },
+ "false_alarm_target": 0.03,
+ "test": {
+  "clean": {
+   "mean": {
+    "real_called_AI": 0.0208,
+    "AI_called_AI": 0.8312,
+    "auc": 0.9821
+   },
+   "max": {
+    "real_called_AI": 0.03,
+    "AI_called_AI": 0.8262,
+    "auc": 0.9772
+   },
+   "top2": {
+    "real_called_AI": 0.0317,
+    "AI_called_AI": 0.8431,
+    "auc": 0.9788
+   },
+   "top3": {
+    "real_called_AI": 0.0258,
+    "AI_called_AI": 0.8463,
+    "auc": 0.9814
+   },
+   "mean+max": {
+    "real_called_AI": 0.0275,
+    "AI_called_AI": 0.8677,
+    "auc": 0.9828
+   }
+  },
+  "half_q75": {
+   "mean": {
+    "real_called_AI": 0.0308,
+    "AI_called_AI": 0.7254,
+    "auc": 0.9497
+   },
+   "max": {
+    "real_called_AI": 0.03,
+    "AI_called_AI": 0.7053,
+    "auc": 0.955
+   },
+   "top2": {
+    "real_called_AI": 0.0375,
+    "AI_called_AI": 0.7185,
+    "auc": 0.9551
+   },
+   "top3": {
+    "real_called_AI": 0.035,
+    "AI_called_AI": 0.7172,
+    "auc": 0.9547
+   },
+   "mean+max": {
+    "real_called_AI": 0.0358,
+    "AI_called_AI": 0.7527,
+    "auc": 0.9572
+   }
+  },
+  "jpeg70": {
+   "mean": {
+    "real_called_AI": 0.0058,
+    "AI_called_AI": 0.4699,
+    "auc": 0.9487
+   },
+   "max": {
+    "real_called_AI": 0.0092,
+    "AI_called_AI": 0.5087,
+    "auc": 0.9513
+   },
+   "top2": {
+    "real_called_AI": 0.0092,
+    "AI_called_AI": 0.5251,
+    "auc": 0.9543
+   },
+   "top3": {
+    "real_called_AI": 0.0075,
+    "AI_called_AI": 0.5201,
+    "auc": 0.9573
+   },
+   "mean+max": {
+    "real_called_AI": 0.0083,
+    "AI_called_AI": 0.5319,
+    "auc": 0.9559
+   }
+  }
+ },
+ "reddit": {
+  "clean": {
+   "mean": {
+    "real_called_AI": 0.0217,
+    "AI_called_AI": 0.479,
+    "auc": 0.9372
+   },
+   "max": {
+    "real_called_AI": 0.0379,
+    "AI_called_AI": 0.4915,
+    "auc": 0.9097
+   },
+   "top2": {
+    "real_called_AI": 0.0339,
+    "AI_called_AI": 0.5184,
+    "auc": 0.9181
+   },
+   "top3": {
+    "real_called_AI": 0.0271,
+    "AI_called_AI": 0.5178,
+    "auc": 0.9227
+   },
+   "mean+max": {
+    "real_called_AI": 0.0325,
+    "AI_called_AI": 0.5409,
+    "auc": 0.9296
+   }
+  }
+ }
+}

@@ -86,8 +86,8 @@ explaining why.
 
 \textbf{Main idea: cross-generator generalization.} The model is trained on one AI generator and
 always tested on generators it has never seen, so it keeps working when new AI tools appear. It
-does this by learning cues that many generators share (general visual features and frequency
-artifacts) instead of memorizing one generator's fingerprint.
+does this by learning cues that many generators share (general visual features from a frozen CLIP encoder,
+read patch by patch) instead of memorizing one generator's fingerprint.
 
 \textbf{Three phases.} We build one content type at a time; each phase ends with a working demo.
 
@@ -97,7 +97,7 @@ artifacts) instead of memorizing one generator's fingerprint.
 \toprule
 \textbf{Phase} & \textbf{Detects} & \textbf{Core algorithm} & \textbf{Timeline} \\
 \midrule
-1 --- Image & Fully AI-generated images & Frozen CLIP features + FFT frequency features + logistic regression & Weeks 1--11 (Oct--Dec 2026) \\
+1 --- Image & Fully AI-generated images & Frozen CLIP features (patch-wise) + calibrated logistic regression & Weeks 1--11 (Oct--Dec 2026) \\
 2 --- Video & Face-swapped / manipulated videos & MTCNN face detection + frame classifier + top-$k$ aggregation & Weeks 12--16 (Dec 2026--Jan 2027) \\
 3 --- Document & Edited regions in documents & OCR + ELA / SRM / DCT maps + dual-stream U-Net + logic checks & Weeks 17--26 (Jan--Mar 2027) \\
 \bottomrule
@@ -142,7 +142,7 @@ artifacts) instead of memorizing one generator's fingerprint.
 \multicolumn{3}{@{}l}{\textbf{\color{cPrimary}Phase 1 --- Image}} \\
 Preprocessing & Same-format re-encoding, center crop $224{\times}224$ & Stops the model from learning ``JPEG = real'' shortcuts; cropping keeps fine artifacts that resizing would blur \\
 Semantic features & \textbf{CLIP ViT-L/14} image encoder (frozen) & General features from 400M images; generalizes to unseen generators \\
-Forensic features & \textbf{FFT} of the noise residual, radial spectrum (64 values) & Generators' up-sampling leaves periodic frequency traces \\
+Forensic features (tested, not used) & \textbf{FFT} of the noise residual, radial spectrum (64 values) & Designed to catch up-sampling traces; gave no gain in our test, so the final model leaves it out \\
 Classifier & \textbf{Logistic regression} head & Simple, fast, cannot over-fit to one generator \\
 Baseline & \textbf{EfficientNet-B0} with transfer learning & Standard CNN to compare against \\
 Explanation & \textbf{Grad-CAM}, patch score map, spectrum plot & Shows where and why the image looks AI-generated \\
@@ -180,14 +180,14 @@ through it once and keep the 768-number output vector, normalized to length 1:
 $\mathbf{z}=g(x)/\lVert g(x)\rVert$. The encoder is \emph{frozen} (not retrained), so it cannot
 memorize one generator's quirks; this is why it generalizes to unseen generators (Ojha et al., CVPR 2023).
 
-\subsection*{Frequency features (Phase 1)}
+\subsection*{Frequency features (Phase 1; tested, not used in the final model)}
 We remove image content with a median filter to keep only fine noise, $r=Y-\operatorname{Med}_{3\times3}(Y)$,
 take its 2-D Fourier transform, and average the log-magnitude spectrum over 64 rings around the
 center. AI up-sampling produces periodic peaks in this spectrum that real camera photos do not have.
 
 \subsection*{Classifier and calibration}
-The two feature vectors are joined and scored by logistic regression,
-$\ell=\mathbf{w}^{\top}[\mathbf{z};\boldsymbol{\phi}]+b$, trained with binary cross-entropy. The score is then
+In the final model only the CLIP vector is used (the frequency vector was tested and dropped), scored by logistic regression,
+$\ell=\mathbf{w}^{\top}\mathbf{z}+b$, trained with binary cross-entropy. The score is then
 calibrated on validation data, $p=\sigma(a\ell+c)$, so that the probability can be trusted.
 
 \subsection*{Grad-CAM (explanation)}
@@ -215,7 +215,7 @@ Because edited pixels are rare, the loss adds Dice to cross-entropy:
 $\mathcal{L}=\mathcal{L}_{\text{BCE}}+1-\frac{2\sum\hat M M}{\sum\hat M+\sum M}$.
 
 \subsection*{Trust Score and verdict}
-All evidence (model score, frequency score, localization score, rule flags) forms a vector $\mathbf{e}$.
+All evidence (model score, localization score, rule flags) forms a vector $\mathbf{e}$.
 A logistic model gives $p_{\text{manip}}=\sigma(\boldsymbol\beta^{\top}\mathbf{e}+\beta_0)$ and
 $T=\operatorname{round}(100(1-p_{\text{manip}}))$. Two thresholds, chosen on validation data so that
 automatic decisions are wrong at most 5\% of the time, split $T$ into the three verdicts.

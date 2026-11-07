@@ -68,7 +68,9 @@ docs/
   walkthroughs/       step-by-step explanation of each build (start here)
   System_Design.tex   full system design: architecture, algorithms, UML/DFD diagrams
   Overview_and_Algorithms.tex   4-page overview
-  Review3_QA.md, Quick_Answers.md   review preparation
+  Work_Summary_Oct_2026.md, Team_Briefing_v3_Plan.md   what was done, plan and team tasks
+paper/                research papers (Review 4): full project and image-only, each with / without authors, plus build scripts and the originality report
+kaggle/               GPU feature-extraction scripts (run on Kaggle)
 PROJECT_ROADMAP.md    26-week plan and weekly log
 ```
 

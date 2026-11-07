@@ -13,7 +13,7 @@ Heads (all share the same frozen CLIP encoder):
                      edited-image patches; calibrated on validation data) - default in the app
   - "ours_v3_proof": the v3 recipe with every OpenAI and Google image removed (cross-generator proof)
   - "ours_v3_noaug": the v3 recipe without compression augmentation (ablation)
-  - "ours_v2": our head trained on many generators, but never on ChatGPT's or Gemini's (default in the app)
+  - "ours_v2": our head trained on many generators, but never on ChatGPT's or Gemini's (kept for comparison)
   - "ours":    our head trained on ONE generator only (SD1.5) - the pure cross-generator experiment
   - "ufd":     UniversalFakeDetect (Ojha et al., CVPR 2023), trained only on ProGAN images
 Our heads are trained by prototype/experiment.py (see prototype/results/ for what each one saw).

@@ -241,7 +241,7 @@ Options for the final full-stack demo (to decide after accuracy is settled):
 ## 12. Sources
 
 **Our own project files**
-- `PROJECT_ROADMAP.md`, `docs/walkthroughs/01_image_prototype.md`, `docs/System_Design.tex`, `docs/SRS.md`, `docs/Review3_QA.md` (in the GitHub repository).
+- `PROJECT_ROADMAP.md`, `docs/walkthroughs/01_image_prototype.md`, `docs/System_Design.tex`, `docs/SRS.md` (in the GitHub repository).
 
 **Research papers**
 - Ojha et al., *Towards Universal Fake Image Detectors that Generalize Across Generative Models* (UniversalFakeDetect), CVPR 2023 — <https://arxiv.org/abs/2302.10174>
@@ -259,4 +259,24 @@ Options for the final full-stack demo (to decide after accuracy is settled):
 - tiny-audits — <https://huggingface.co/datasets/DivyaApp/tiny-audits>
 - Tiny-GenImage (used in the prototype) — <https://huggingface.co/datasets/TheKernel01/Tiny-GenImage>
 
-**Note on reliability:** the dataset facts in Section 5 were read from Hugging Face on 14 Oct 2026. PromptForge-350k and MLLM-Edit were found through a web search only; their availability and editor lists are **unverified**. The accuracy expectations in Section 4.4 are estimates, not measurements, until v3 is trained and tested.
+**Note on reliability:** the dataset facts in Section 5 were read from Hugging Face on 14 Oct 2026. PromptForge-350k and MLLM-Edit were found through a web search only; their availability and editor lists are **unverified**. The accuracy expectations in Section 4.4 are estimates, not measurements, until v3 is trained and tested. (Update, 15 Oct: v3 *was* trained and tested; the measured numbers are in the Work Summary and Walkthrough 02.)
+
+---
+
+## 13. Update 15 Oct — next version (v4) and extra tasks
+
+Details and explanations are in **`docs/Work_Summary_Oct_2026.md`** (Sections 9–11; PDF `Work_Summary_Oct_2026.pdf`). In short:
+
+**How the model works (for the viva).** We use OpenAI's pretrained **CLIP** as a *frozen* feature extractor (we do not train it) and **train our own small classifier head** on labelled real/AI images from public datasets. We did **not** train a neural network from scratch. The same CLIP is used for v1, v2, v3; only the head (the training data) differs. Streamlit is both the frontend and the backend today; the separate frontend will call a small API that Pawan and Claude build.
+
+**v4 plan (to be done when Pawan says go), by expected gain:**
+1. Use CLIP's **middle layers** (they keep the fine traces that compression erases).
+2. **More data**: v3 used about 1% of OpenFake's 2.3 million training images; first test whether more data still helps, then extract 100k–300k images on Kaggle.
+3. **Closer-to-real data**: phone-style real photos and harsher degradations (WhatsApp-style double compression, screenshots, upscaling).
+4. A **stronger classifier** (small neural network or light fine-tuning of CLIP) — the place where a long Kaggle training run makes sense.
+5. **Finer heatmap** and more patches at test time for partly edited images.
+6. Missing roadmap items: EfficientNet baseline, more robustness curves, calibration plot, data card, Phase 1 summary.
+
+**Extra task for the teammates:** collect **at least 200 phone-style real photos** (original files, different phones, indoor/outdoor, people, text on boards; also some sent through WhatsApp and some screenshots). Write which phone took which photo. About 30% will be kept only for testing, the rest may be used for training. Do not edit or filter them. This is *in addition to* Task A (ChatGPT/Gemini images) and Task B (frontend).
+
+**Honest note on accuracy.** Our test set deliberately contains AI tools the model never saw, so our numbers are not comparable with classifiers whose test images look like their training images (for example a plant-disease classifier trained on 1 million images). Compressed AI images and ChatGPT/Gemini *edits of real photos* are still the open problems.
