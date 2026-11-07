@@ -179,7 +179,7 @@ Some datasets need a form or email and can take weeks to approve. Request everyt
 **Show supervisor:** working evaluation script and empty results table layout.
 
 ### Week 4 · Oct 19 – Oct 25 · Baseline: EfficientNet
-- [ ] Fine-tune EfficientNet-B0 (pretrained on ImageNet) on SD v1.4 real vs fake
+- [x] Fine-tune EfficientNet-B0 (pretrained on ImageNet) on SD v1.4 real vs fake *(done on the OpenFake training images instead, same data as v3: AUC 0.831, [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md) Entry 30)*
 - [ ] Test on all 8 generators
 - [ ] Expected: high accuracy on SD v1.4, lower on others. **This shows the generalization problem our project solves.**
 
@@ -372,6 +372,13 @@ Some datasets need a form or email and can take weeks to approve. Request everyt
 ## 9. Results board
 
 Fill these in as experiments finish. Use `—` for "not run yet".
+
+### Phase 1 — Image, final comparison on OpenFake held-out test images (3,392 images, generators unseen in training; filled 7 Nov 2026)
+
+| Model | Clean AUC | JPEG 70 AUC | Half size + JPEG 75 AUC | Average AUC, 7 named held-out generators |
+|---|---|---|---|---|
+| EfficientNet-B0 (same training images) | 0.831 | 0.830 | 0.869 | 0.841 |
+| **CLIP + classifier, model v3** | **0.982** | **0.949** | **0.950** | **0.984** |
 
 ### Phase 1 — Image (accuracy / AUC, trained on SD v1.4)
 

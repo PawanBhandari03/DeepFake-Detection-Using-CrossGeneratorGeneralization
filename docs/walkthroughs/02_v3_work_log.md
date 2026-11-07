@@ -284,6 +284,20 @@ Reading: the model can tell AI-edited regions from real photos at the patch leve
 - **Finer heatmap (done):** `Detector.fine_grid()` scores a 6x6 grid for display only (about 40 s on a laptop CPU); the app's Heatmap tab has the option "Finer heatmap (6 x 6 patches)". The verdict still uses the ten-patch rule. Smoke-tested with Streamlit's AppTest on a sample image, no exceptions. Models version string bumped so the hosted app reloads.
 - **EfficientNet baseline (SRS 4.2):** Kaggle job `kaggle/effnet` trains EfficientNet-B0 on the same 30,420 OpenFake training images and scores the same 3,392 test images in three variants. Result to be added below when it finishes.
 
+### Entry 30 — 7 Nov · EfficientNet-B0 baseline measured (SRS 4.2)
+- **Run:** Kaggle job `kaggle/effnet/effnet.py` (34 minutes, T4). ImageNet-pretrained EfficientNet-B0 (timm), whole image resized to 224 x 224, random flip, AdamW lr 2e-4, 3 epochs, one-cycle schedule, mixed precision. Recipe fixed beforehand, nothing tuned on test images. Trained on the same 30,420 OpenFake training images as v3 (all loaded, 52.6% fake) and scored on the same 3,392 held-out test images (generators never seen in training) in the same three variants. Comparison script `prototype/compare_effnet.py`; results `prototype/results/effnet_comparison.json`; predictions `kaggle/effnet/out/preds.csv`.
+- **Result (image level, test images):**
+
+| Variant | EfficientNet-B0: AUC / AI caught / real OK | Our v3: AUC / AI caught / real OK |
+|---|---|---|
+| Clean | 0.831 / 65.1% / 85.6% | **0.982** / 93.5% / 92.5% |
+| JPEG 70 | 0.830 / 59.9% / 89.2% | **0.949** / 66.0% / 97.2% |
+| Half size + JPEG 75 | 0.869 / 54.5% / 94.7% | **0.950** / 86.0% / 89.5% |
+
+  Per generator (clean AUC, EfficientNet vs ours): FLUX.2 klein 0.703 vs 0.982; GPT-Image-1.5 0.903 vs 0.972; Midjourney v7 0.834 vs 0.985; Veo 3 0.805 vs 0.981; Z-Image Turbo 0.825 vs 0.984; Recraft v3 0.579 vs 0.988; Nano Banana Pro 0.856 vs 0.985. Average over the seven largest held-out generators: **0.841 vs 0.984**.
+- **SRS 4.2 image target met:** seen AUC >= 0.95 and unseen-generator AUC >= 0.80 and above the EfficientNet baseline (0.984 vs 0.841 average over the named held-out generators).
+- **Honest reading:** the baseline's training loss fell to 0.109 while its test AUC stayed at 0.83, the usual picture of a fully fine-tuned CNN fitting its training generators. The two models differ in more than the encoder (ours scores native-resolution patches; the baseline sees the whole image resized, the standard way), so the table compares two complete recipes, not CLIP against EfficientNet alone. The original roadmap baseline (trained on Stable Diffusion v1.4 only) was not run; this baseline uses the same modern training data as v3, which is the fairer test.
+
 ---
 
 ## 2. Roadmap items ticked so far

@@ -1,0 +1,633 @@
+{
+ "n_images": 3392,
+ "efficientnet_b0": {
+  "clean": {
+   "n_real": 1200,
+   "n_fake": 2192,
+   "auc": 0.8307,
+   "real_correct": 0.8558,
+   "fake_caught": 0.6515,
+   "per_generator": {
+    "aurora-20-1-25": {
+     "n": 31,
+     "auc": 0.8334,
+     "caught": 0.6774
+    },
+    "ernie-image": {
+     "n": 29,
+     "auc": 0.8444,
+     "caught": 0.7241
+    },
+    "ernie-image-turbo": {
+     "n": 62,
+     "auc": 0.8435,
+     "caught": 0.7097
+    },
+    "flux.2-klein-9b": {
+     "n": 250,
+     "auc": 0.7032,
+     "caught": 0.372
+    },
+    "frames-23-1-25": {
+     "n": 25,
+     "auc": 0.7414,
+     "caught": 0.56
+    },
+    "gpt-image-1.5": {
+     "n": 250,
+     "auc": 0.9034,
+     "caught": 0.804
+    },
+    "gpt-image-2": {
+     "n": 53,
+     "auc": 0.8234,
+     "caught": 0.6038
+    },
+    "halfmoon-4-4-25": {
+     "n": 21,
+     "auc": 0.7467,
+     "caught": 0.5714
+    },
+    "illustrious": {
+     "n": 250,
+     "auc": 0.9625,
+     "caught": 0.92
+    },
+    "lumina-17-2-25": {
+     "n": 49,
+     "auc": 0.9059,
+     "caught": 0.7755
+    },
+    "midjourney-7": {
+     "n": 250,
+     "auc": 0.8343,
+     "caught": 0.648
+    },
+    "nano-banana-pro": {
+     "n": 47,
+     "auc": 0.8562,
+     "caught": 0.7234
+    },
+    "recraft-v2": {
+     "n": 23,
+     "auc": 0.8285,
+     "caught": 0.4783
+    },
+    "recraft-v3": {
+     "n": 105,
+     "auc": 0.5786,
+     "caught": 0.2571
+    },
+    "seedream-v5.0": {
+     "n": 30,
+     "auc": 0.757,
+     "caught": 0.4333
+    },
+    "sora-2": {
+     "n": 76,
+     "auc": 0.8675,
+     "caught": 0.75
+    },
+    "veo-3": {
+     "n": 250,
+     "auc": 0.8055,
+     "caught": 0.588
+    },
+    "wan-video-2.5": {
+     "n": 123,
+     "auc": 0.9277,
+     "caught": 0.8374
+    },
+    "z-image-turbo": {
+     "n": 250,
+     "auc": 0.8249,
+     "caught": 0.632
+    }
+   }
+  },
+  "half_q75": {
+   "n_real": 1200,
+   "n_fake": 2192,
+   "auc": 0.8692,
+   "real_correct": 0.9467,
+   "fake_caught": 0.5452,
+   "per_generator": {
+    "aurora-20-1-25": {
+     "n": 31,
+     "auc": 0.8404,
+     "caught": 0.4839
+    },
+    "ernie-image": {
+     "n": 29,
+     "auc": 0.8929,
+     "caught": 0.6207
+    },
+    "ernie-image-turbo": {
+     "n": 62,
+     "auc": 0.8969,
+     "caught": 0.6774
+    },
+    "flux.2-klein-9b": {
+     "n": 250,
+     "auc": 0.7907,
+     "caught": 0.284
+    },
+    "frames-23-1-25": {
+     "n": 25,
+     "auc": 0.8294,
+     "caught": 0.52
+    },
+    "gpt-image-1.5": {
+     "n": 250,
+     "auc": 0.938,
+     "caught": 0.74
+    },
+    "gpt-image-2": {
+     "n": 53,
+     "auc": 0.8818,
+     "caught": 0.5283
+    },
+    "halfmoon-4-4-25": {
+     "n": 21,
+     "auc": 0.7824,
+     "caught": 0.4286
+    },
+    "illustrious": {
+     "n": 250,
+     "auc": 0.9706,
+     "caught": 0.884
+    },
+    "lumina-17-2-25": {
+     "n": 49,
+     "auc": 0.941,
+     "caught": 0.7551
+    },
+    "midjourney-7": {
+     "n": 250,
+     "auc": 0.8685,
+     "caught": 0.468
+    },
+    "nano-banana-pro": {
+     "n": 47,
+     "auc": 0.8925,
+     "caught": 0.4681
+    },
+    "recraft-v2": {
+     "n": 23,
+     "auc": 0.8644,
+     "caught": 0.3478
+    },
+    "recraft-v3": {
+     "n": 105,
+     "auc": 0.5843,
+     "caught": 0.1048
+    },
+    "seedream-v5.0": {
+     "n": 30,
+     "auc": 0.8635,
+     "caught": 0.4333
+    },
+    "sora-2": {
+     "n": 76,
+     "auc": 0.9029,
+     "caught": 0.6447
+    },
+    "veo-3": {
+     "n": 250,
+     "auc": 0.8522,
+     "caught": 0.472
+    },
+    "wan-video-2.5": {
+     "n": 123,
+     "auc": 0.9011,
+     "caught": 0.626
+    },
+    "z-image-turbo": {
+     "n": 250,
+     "auc": 0.8747,
+     "caught": 0.532
+    }
+   }
+  },
+  "jpeg70": {
+   "n_real": 1200,
+   "n_fake": 2192,
+   "auc": 0.8298,
+   "real_correct": 0.8925,
+   "fake_caught": 0.599,
+   "per_generator": {
+    "aurora-20-1-25": {
+     "n": 31,
+     "auc": 0.8126,
+     "caught": 0.6129
+    },
+    "ernie-image": {
+     "n": 29,
+     "auc": 0.8546,
+     "caught": 0.6552
+    },
+    "ernie-image-turbo": {
+     "n": 62,
+     "auc": 0.8519,
+     "caught": 0.6935
+    },
+    "flux.2-klein-9b": {
+     "n": 250,
+     "auc": 0.7215,
+     "caught": 0.344
+    },
+    "frames-23-1-25": {
+     "n": 25,
+     "auc": 0.7606,
+     "caught": 0.56
+    },
+    "gpt-image-1.5": {
+     "n": 250,
+     "auc": 0.9089,
+     "caught": 0.776
+    },
+    "gpt-image-2": {
+     "n": 53,
+     "auc": 0.8286,
+     "caught": 0.566
+    },
+    "halfmoon-4-4-25": {
+     "n": 21,
+     "auc": 0.7262,
+     "caught": 0.4762
+    },
+    "illustrious": {
+     "n": 250,
+     "auc": 0.9613,
+     "caught": 0.904
+    },
+    "lumina-17-2-25": {
+     "n": 49,
+     "auc": 0.9098,
+     "caught": 0.7551
+    },
+    "midjourney-7": {
+     "n": 250,
+     "auc": 0.8166,
+     "caught": 0.536
+    },
+    "nano-banana-pro": {
+     "n": 47,
+     "auc": 0.8508,
+     "caught": 0.5957
+    },
+    "recraft-v2": {
+     "n": 23,
+     "auc": 0.8001,
+     "caught": 0.4348
+    },
+    "recraft-v3": {
+     "n": 105,
+     "auc": 0.5626,
+     "caught": 0.1619
+    },
+    "seedream-v5.0": {
+     "n": 30,
+     "auc": 0.7717,
+     "caught": 0.4333
+    },
+    "sora-2": {
+     "n": 76,
+     "auc": 0.8633,
+     "caught": 0.6842
+    },
+    "veo-3": {
+     "n": 250,
+     "auc": 0.8065,
+     "caught": 0.548
+    },
+    "wan-video-2.5": {
+     "n": 123,
+     "auc": 0.9124,
+     "caught": 0.7398
+    },
+    "z-image-turbo": {
+     "n": 250,
+     "auc": 0.8267,
+     "caught": 0.576
+    }
+   }
+  },
+  "clean_average_auc_over_named_generators": 0.8414
+ },
+ "ours_v3": {
+  "clean": {
+   "n_real": 1200,
+   "n_fake": 2192,
+   "auc": 0.9821,
+   "real_correct": 0.925,
+   "fake_caught": 0.9352,
+   "per_generator": {
+    "aurora-20-1-25": {
+     "n": 31,
+     "auc": 0.9667,
+     "caught": 0.871
+    },
+    "ernie-image": {
+     "n": 29,
+     "auc": 0.9792,
+     "caught": 0.9655
+    },
+    "ernie-image-turbo": {
+     "n": 62,
+     "auc": 0.9915,
+     "caught": 1.0
+    },
+    "flux.2-klein-9b": {
+     "n": 250,
+     "auc": 0.9816,
+     "caught": 0.936
+    },
+    "frames-23-1-25": {
+     "n": 25,
+     "auc": 0.9886,
+     "caught": 1.0
+    },
+    "gpt-image-1.5": {
+     "n": 250,
+     "auc": 0.9724,
+     "caught": 0.888
+    },
+    "gpt-image-2": {
+     "n": 53,
+     "auc": 0.9719,
+     "caught": 0.9245
+    },
+    "halfmoon-4-4-25": {
+     "n": 21,
+     "auc": 0.9982,
+     "caught": 1.0
+    },
+    "illustrious": {
+     "n": 250,
+     "auc": 0.9971,
+     "caught": 0.988
+    },
+    "lumina-17-2-25": {
+     "n": 49,
+     "auc": 0.9848,
+     "caught": 0.9184
+    },
+    "midjourney-7": {
+     "n": 250,
+     "auc": 0.9853,
+     "caught": 0.948
+    },
+    "nano-banana-pro": {
+     "n": 47,
+     "auc": 0.985,
+     "caught": 0.9362
+    },
+    "recraft-v2": {
+     "n": 23,
+     "auc": 0.9902,
+     "caught": 0.9565
+    },
+    "recraft-v3": {
+     "n": 105,
+     "auc": 0.9879,
+     "caught": 0.9619
+    },
+    "seedream-v5.0": {
+     "n": 30,
+     "auc": 0.8953,
+     "caught": 0.6
+    },
+    "sora-2": {
+     "n": 76,
+     "auc": 0.9503,
+     "caught": 0.7632
+    },
+    "veo-3": {
+     "n": 250,
+     "auc": 0.981,
+     "caught": 0.928
+    },
+    "wan-video-2.5": {
+     "n": 123,
+     "auc": 0.9944,
+     "caught": 0.9919
+    },
+    "z-image-turbo": {
+     "n": 250,
+     "auc": 0.9843,
+     "caught": 0.952
+    }
+   }
+  },
+  "half_q75": {
+   "n_real": 1200,
+   "n_fake": 2192,
+   "auc": 0.9497,
+   "real_correct": 0.895,
+   "fake_caught": 0.8604,
+   "per_generator": {
+    "aurora-20-1-25": {
+     "n": 31,
+     "auc": 0.963,
+     "caught": 0.871
+    },
+    "ernie-image": {
+     "n": 29,
+     "auc": 0.9748,
+     "caught": 0.8966
+    },
+    "ernie-image-turbo": {
+     "n": 62,
+     "auc": 0.978,
+     "caught": 0.9355
+    },
+    "flux.2-klein-9b": {
+     "n": 250,
+     "auc": 0.8284,
+     "caught": 0.512
+    },
+    "frames-23-1-25": {
+     "n": 25,
+     "auc": 0.9727,
+     "caught": 0.92
+    },
+    "gpt-image-1.5": {
+     "n": 250,
+     "auc": 0.9848,
+     "caught": 0.964
+    },
+    "gpt-image-2": {
+     "n": 53,
+     "auc": 0.9311,
+     "caught": 0.8113
+    },
+    "halfmoon-4-4-25": {
+     "n": 21,
+     "auc": 0.9812,
+     "caught": 1.0
+    },
+    "illustrious": {
+     "n": 250,
+     "auc": 0.9995,
+     "caught": 1.0
+    },
+    "lumina-17-2-25": {
+     "n": 49,
+     "auc": 0.9913,
+     "caught": 0.9796
+    },
+    "midjourney-7": {
+     "n": 250,
+     "auc": 0.9649,
+     "caught": 0.924
+    },
+    "nano-banana-pro": {
+     "n": 47,
+     "auc": 0.9849,
+     "caught": 0.9787
+    },
+    "recraft-v2": {
+     "n": 23,
+     "auc": 0.9831,
+     "caught": 0.9565
+    },
+    "recraft-v3": {
+     "n": 105,
+     "auc": 0.9035,
+     "caught": 0.7048
+    },
+    "seedream-v5.0": {
+     "n": 30,
+     "auc": 0.9791,
+     "caught": 0.9667
+    },
+    "sora-2": {
+     "n": 76,
+     "auc": 0.9592,
+     "caught": 0.9211
+    },
+    "veo-3": {
+     "n": 250,
+     "auc": 0.9616,
+     "caught": 0.892
+    },
+    "wan-video-2.5": {
+     "n": 123,
+     "auc": 0.9817,
+     "caught": 0.9593
+    },
+    "z-image-turbo": {
+     "n": 250,
+     "auc": 0.9221,
+     "caught": 0.76
+    }
+   }
+  },
+  "jpeg70": {
+   "n_real": 1200,
+   "n_fake": 2192,
+   "auc": 0.9487,
+   "real_correct": 0.9717,
+   "fake_caught": 0.6597,
+   "per_generator": {
+    "aurora-20-1-25": {
+     "n": 31,
+     "auc": 0.959,
+     "caught": 0.5806
+    },
+    "ernie-image": {
+     "n": 29,
+     "auc": 0.948,
+     "caught": 0.7241
+    },
+    "ernie-image-turbo": {
+     "n": 62,
+     "auc": 0.9665,
+     "caught": 0.7419
+    },
+    "flux.2-klein-9b": {
+     "n": 250,
+     "auc": 0.8883,
+     "caught": 0.26
+    },
+    "frames-23-1-25": {
+     "n": 25,
+     "auc": 0.9636,
+     "caught": 0.64
+    },
+    "gpt-image-1.5": {
+     "n": 250,
+     "auc": 0.9474,
+     "caught": 0.696
+    },
+    "gpt-image-2": {
+     "n": 53,
+     "auc": 0.9404,
+     "caught": 0.6038
+    },
+    "halfmoon-4-4-25": {
+     "n": 21,
+     "auc": 0.9781,
+     "caught": 0.8571
+    },
+    "illustrious": {
+     "n": 250,
+     "auc": 0.9919,
+     "caught": 0.96
+    },
+    "lumina-17-2-25": {
+     "n": 49,
+     "auc": 0.9743,
+     "caught": 0.8163
+    },
+    "midjourney-7": {
+     "n": 250,
+     "auc": 0.9545,
+     "caught": 0.776
+    },
+    "nano-banana-pro": {
+     "n": 47,
+     "auc": 0.9525,
+     "caught": 0.6596
+    },
+    "recraft-v2": {
+     "n": 23,
+     "auc": 0.9609,
+     "caught": 0.7826
+    },
+    "recraft-v3": {
+     "n": 105,
+     "auc": 0.9658,
+     "caught": 0.6667
+    },
+    "seedream-v5.0": {
+     "n": 30,
+     "auc": 0.8605,
+     "caught": 0.2333
+    },
+    "sora-2": {
+     "n": 76,
+     "auc": 0.8909,
+     "caught": 0.3816
+    },
+    "veo-3": {
+     "n": 250,
+     "auc": 0.9444,
+     "caught": 0.608
+    },
+    "wan-video-2.5": {
+     "n": 123,
+     "auc": 0.9884,
+     "caught": 0.8537
+    },
+    "z-image-turbo": {
+     "n": 250,
+     "auc": 0.9489,
+     "caught": 0.608
+    }
+   }
+  },
+  "clean_average_auc_over_named_generators": 0.9838
+ }
+}
