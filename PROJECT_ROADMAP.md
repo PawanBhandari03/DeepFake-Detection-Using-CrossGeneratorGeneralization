@@ -221,7 +221,7 @@ Some datasets need a form or email and can take weeks to approve. Request everyt
 **Show supervisor:** results on our own 2026 test set (this is an original contribution).
 
 ### Week 10 · Nov 30 – Dec 6 · Explanations and calibrated Trust Score
-- [~] Heatmaps: Grad-CAM on EfficientNet; a patch-level score map for the CLIP model (score small crops of the image) *(3×3 patch map done; finer grid planned in v3)*
+- [~] Heatmaps: Grad-CAM on EfficientNet; a patch-level score map for the CLIP model (score small crops of the image) *(3×3 patch map in the verdict; optional 6×6 map in the app, 7 Nov; Grad-CAM not built because the baseline is not used in the app)*
 - [x] Calibrate the model's probability on the validation set (temperature / Platt scaling); plot a reliability diagram *(Platt scaling and reliability diagram done for v3)*
 - [x] Turn it into a 0–100 Trust Score and choose the three verdict bands using validation data (not guessed numbers) *(v3: Authentic ≥ 54, AI-generated ≤ 17; `prototype/calibrate_v3.py`)*
 - [x] Write template sentences for the plain-language explanation *(`prototype/trust.py`)*
@@ -449,7 +449,8 @@ Copy this block for each week.
 ### Week 3 · Oct 12 – Oct 18, 2026 · In progress
 - Done (13–14 Oct): decided the v3 plan (demo model + proof model, JPEG augmentation, finer heatmap, edited-image data); checked datasets (DiffSeg30k, tiny-audits, full OpenFake layout); wrote the [Team Briefing](docs/Team_Briefing_v3_Plan.md) and started [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md) (running log). Roadmap items already covered by the prototype ticked.
 - Done (14 Oct, later): Kaggle feature extraction finished (414k patches); trained v3, v3-proof and v3-no-augmentation; calibrated v3 and chose verdict bands on validation data; added v3 to the app as the default model. Results in the Results board below and in Walkthrough 02 (Entries 9–12).
-- Next: test on the team's own ChatGPT/Gemini photos (waiting for Task A), finer heatmap and region-based verdict, update the cross-generator page and slides.
+- Done (7 Nov): finer 6×6 heatmap option in the app; region-based verdict tested on 764 held-out edited images and not adopted (gain under 2:1 against the cost, [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md) Entry 29); design documents aligned with the final model; EfficientNet baseline run on Kaggle.
+- Next: the team's own ChatGPT/Gemini edited photos with their originals (the decisive test for edits), phone photos, EfficientNet result in the results board.
 
 ---
 
