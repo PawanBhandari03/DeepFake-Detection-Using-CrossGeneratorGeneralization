@@ -298,6 +298,22 @@ Reading: the model can tell AI-edited regions from real photos at the patch leve
 - **SRS 4.2 image target met:** seen AUC >= 0.95 and unseen-generator AUC >= 0.80 and above the EfficientNet baseline (0.984 vs 0.841 average over the named held-out generators).
 - **Honest reading:** the baseline's training loss fell to 0.109 while its test AUC stayed at 0.83, the usual picture of a fully fine-tuned CNN fitting its training generators. The two models differ in more than the encoder (ours scores native-resolution patches; the baseline sees the whole image resized, the standard way), so the table compares two complete recipes, not CLIP against EfficientNet alone. The original roadmap baseline (trained on Stable Diffusion v1.4 only) was not run; this baseline uses the same modern training data as v3, which is the fairer test.
 
+### Entry 31 — 10 Nov · Team photos: real phone photos and their ChatGPT / Gemini versions
+
+- **Data (from Bhoomi's friend, Drive folder "Project Images"):** 10 real phone photos (`real`), and the same 10 scenes re-made in ChatGPT (`chatgpt`) and Gemini (`gemini`), paired by number 01-10. Everything is a JPEG of about 1 megapixel and 60-350 KB, so the files were compressed on the way (a phone photo is normally 2-6 MB). Labels come from the folder names.
+- **Result with v3 (Trust bands: Authentic >= 54, AI <= 17):**
+
+| Folder | Authentic | Needs Human Review | AI |
+|---|---|---|---|
+| real (10) | 2 | 5 | 3 |
+| ChatGPT (10) | 1 | 5 | 4 |
+| Gemini (10) | 3 | 3 | 4 |
+
+  AUC real vs ChatGPT 0.66, real vs Gemini 0.54, real vs both 0.60. The edit scored more AI-like than its own original in 7 of 10 ChatGPT pairs and 5 of 10 Gemini pairs.
+- **Honest reading:** on these compressed phone-size files v3 does not separate real from ChatGPT/Gemini images, and 3 of 10 real photos were called AI. This is far below the held-out test (AUC 0.982). Compression is the likely cause (the robustness tests already showed it is the weak point: JPEG 50 catches 38%), but it is not proven here, because the original full-size files were not available. Ten images per group is also a small sample.
+- **Other checks done the same day:** 20 full-size PNG ChatGPT downloads (Rahul's zip): 17 called AI, 2 Review, 1 Authentic. One Gemini image (with the visible Gemini mark): Trust 84, Authentic. A zip of 20 "real" photos (mostly WhatsApp copies, labels unverified): 12 Authentic, 5 Review, 3 AI, so not used as a result.
+- **Known limitation, stated in the project:** v3 works best on full-size, lightly compressed images. Small or heavily compressed photos, and photos re-made by Gemini or ChatGPT, are not reliable and should go to human review. No retraining was done. Scores are in `prototype/results/team_photos_check.json`.
+
 ---
 
 ## 2. Roadmap items ticked so far
@@ -308,7 +324,7 @@ See `PROJECT_ROADMAP.md`. Items are ticked only when the work exists and was che
 
 ## 3. What is next
 
-1. Test v3 on the team's own ChatGPT / Gemini photos, including partly edited ones (waiting for their images).
+1. Team ChatGPT / Gemini photos tested on 10 Nov (Entry 31): weak on compressed phone-size files. Re-test with full-size originals if they can be sent as documents.
 2. Finer heatmap (for example 6 × 6) and a verdict based on the most suspicious region, for partly edited images.
 3. Update the Cross-Generator Test page with the v3 numbers.
 4. FastAPI wrapper so the separate frontend can call the model.

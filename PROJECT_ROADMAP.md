@@ -457,7 +457,8 @@ Copy this block for each week.
 - Done (13–14 Oct): decided the v3 plan (demo model + proof model, JPEG augmentation, finer heatmap, edited-image data); checked datasets (DiffSeg30k, tiny-audits, full OpenFake layout); wrote the [Team Briefing](docs/Team_Briefing_v3_Plan.md) and started [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md) (running log). Roadmap items already covered by the prototype ticked.
 - Done (14 Oct, later): Kaggle feature extraction finished (414k patches); trained v3, v3-proof and v3-no-augmentation; calibrated v3 and chose verdict bands on validation data; added v3 to the app as the default model. Results in the Results board below and in Walkthrough 02 (Entries 9–12).
 - Done (7 Nov): finer 6×6 heatmap option in the app; region-based verdict tested on 764 held-out edited images and not adopted (gain under 2:1 against the cost, [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md) Entry 29); design documents aligned with the final model; EfficientNet baseline run on Kaggle.
-- Next: the team's own ChatGPT/Gemini edited photos with their originals (the decisive test for edits), phone photos, EfficientNet result in the results board.
+- Done (10 Nov): team test of 10 real phone photos and their ChatGPT and Gemini versions (compressed JPEGs): v3 did not separate them reliably (AUC 0.66 ChatGPT, 0.54 Gemini; 3 of 10 real photos called AI); 20 full-size ChatGPT PNGs: 17 called AI. Stated as a known limitation (small or compressed images). See [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md) Entry 31.
+- Next: re-test with full-size originals if available; otherwise the image section is closed with this limitation stated.
 
 ---
 
