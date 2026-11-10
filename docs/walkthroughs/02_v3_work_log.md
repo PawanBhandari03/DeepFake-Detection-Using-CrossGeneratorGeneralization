@@ -316,6 +316,22 @@ Reading: the model can tell AI-edited regions from real photos at the patch leve
 
 ---
 
+### Entry 32 — 10 Nov · Team photos re-tested with full-size originals
+
+The friend re-sent the files without WhatsApp: 10 real phone photos (about 12 MP, EXIF present, JPEG), 10 ChatGPT edits (about 1 MP PNG) and 10 Gemini edits (about 4 MP PNG). Same v3 analyser, same scoring as Entry 31. Per-image scores: `prototype/results/team_photos_fullsize_check.json`.
+
+| Set | Authentic | Needs Human Review | AI |
+|---|---|---|---|
+| Real photos | 9 | 0 | 1 |
+| ChatGPT edits | 0 | 2 | 8 |
+| Gemini edits | 2 | 7 | 1 |
+
+- AUC, real vs ChatGPT: 0.95. Real vs Gemini: 0.83. Real vs both: 0.89 (10 + 20 images, so only a rough guide).
+- In all 10 pairs, for both ChatGPT and Gemini, the edit scored more AI-like than its own original.
+- One real photo (02) was called AI (Trust 13): a false alarm. Two Gemini edits (05, 09) were called Authentic: misses.
+- Compared with Entry 31 (WhatsApp copies, AUC 0.66 / 0.54), full-size files work much better. This supports compression as the cause of the earlier weak result, but the two sets also differ in format and size, so it is not a controlled proof.
+- Limitation to state: ChatGPT edits are caught well; Gemini edits are mostly sent to human review rather than flagged AI; heavily compressed copies (for example WhatsApp) are unreliable. No retraining was done.
+
 ## 2. Roadmap items ticked so far
 
 See `PROJECT_ROADMAP.md`. Items are ticked only when the work exists and was checked. Items completed in earlier work by the prototype (setup, first data, CLIP model, cross-generator test) were ticked on 14 Oct with a pointer to Walkthrough 01.
