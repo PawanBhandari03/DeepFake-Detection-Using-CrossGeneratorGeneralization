@@ -300,7 +300,7 @@ Reading: the model can tell AI-edited regions from real photos at the patch leve
 
 ### Entry 31 — 10 Nov · Team photos: real phone photos and their ChatGPT / Gemini versions
 
-- **Data (from Bhoomi's friend, Drive folder "Project Images"):** 10 real phone photos (`real`), and the same 10 scenes re-made in ChatGPT (`chatgpt`) and Gemini (`gemini`), paired by number 01-10. Everything is a JPEG of about 1 megapixel and 60-350 KB, so the files were compressed on the way (a phone photo is normally 2-6 MB). Labels come from the folder names.
+- **Data (from Bhoomi's friend, Drive folder "Project Images"):** 10 real phone photos (`real`), and the same 10 scenes re-made in ChatGPT (`chatgpt`) and Gemini (`gemini`), paired by number 01-10. Everything is a JPEG of about 1 megapixel and 60-350 KB with no camera metadata; the sender confirmed the files were sent through WhatsApp before the Drive link was made, so they are WhatsApp-compressed copies, not camera originals (a phone photo is normally 2-6 MB). Labels come from the folder names.
 - **Result with v3 (Trust bands: Authentic >= 54, AI <= 17):**
 
 | Folder | Authentic | Needs Human Review | AI |
@@ -310,7 +310,7 @@ Reading: the model can tell AI-edited regions from real photos at the patch leve
 | Gemini (10) | 3 | 3 | 4 |
 
   AUC real vs ChatGPT 0.66, real vs Gemini 0.54, real vs both 0.60. The edit scored more AI-like than its own original in 7 of 10 ChatGPT pairs and 5 of 10 Gemini pairs.
-- **Honest reading:** on these compressed phone-size files v3 does not separate real from ChatGPT/Gemini images, and 3 of 10 real photos were called AI. This is far below the held-out test (AUC 0.982). Compression is the likely cause (the robustness tests already showed it is the weak point: JPEG 50 catches 38%), but it is not proven here, because the original full-size files were not available. Ten images per group is also a small sample.
+- **Honest reading:** on these compressed phone-size files v3 does not separate real from ChatGPT/Gemini images, and 3 of 10 real photos were called AI. This is far below the held-out test (AUC 0.982). The WhatsApp compression is the likely cause (the robustness tests already showed compression is the weak point: JPEG 50 catches 38%), but it is not proven until the full-size originals are tested. Ten images per group is also a small sample.
 - **Other checks done the same day:** 20 full-size PNG ChatGPT downloads (Rahul's zip): 17 called AI, 2 Review, 1 Authentic. One Gemini image (with the visible Gemini mark): Trust 84, Authentic. A zip of 20 "real" photos (mostly WhatsApp copies, labels unverified): 12 Authentic, 5 Review, 3 AI, so not used as a result.
 - **Known limitation, stated in the project:** v3 works best on full-size, lightly compressed images. Small or heavily compressed photos, and photos re-made by Gemini or ChatGPT, are not reliable and should go to human review. No retraining was done. Scores are in `prototype/results/team_photos_check.json`.
 
