@@ -13,3 +13,4 @@ data/
 kaggle/**/out/
 kaggle/**/out2/
 kaggle/**/partial/
+prototype/_cache/
