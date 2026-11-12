@@ -332,6 +332,15 @@ The friend re-sent the files without WhatsApp: 10 real phone photos (about 12 MP
 - Compared with Entry 31 (WhatsApp copies, AUC 0.66 / 0.54), full-size files work much better. This supports compression as the cause of the earlier weak result, but the two sets also differ in format and size, so it is not a controlled proof.
 - Limitation to state: ChatGPT edits are caught well; Gemini edits are mostly sent to human review rather than flagged AI; heavily compressed copies (for example WhatsApp) are unreliable. No retraining was done.
 
+### Entry 33 — 12 Nov · Edge-case notices in the app (drawings, small images, messaging-app files)
+
+The HOD tried a hand-made Paint drawing: Trust 45, Needs Human Review. Drawings are outside what the detector was built for, so the app now says so. New file `prototype/imagetype.py`; the AI probability is never changed.
+
+- **Drawing / graphic / screenshot:** at least 85% flat 8x8 blocks and at most 4000 distinct colours (on a 256 px copy). Shows a notice and sets the verdict to Needs Human Review.
+- **Small image:** shorter side under 448 px. Notice only.
+- **Messaging-app file:** JPEG, no EXIF, long side 1200-1300 px. Notice only (heuristic, worded "may have been").
+- **Checked for false alarms:** none of the 30 full-size team photos (real, ChatGPT, Gemini; flat share up to 0.78, at least 6849 colours) and none of the 40 sample test images were flagged as graphic. Two synthetic doodles (flat share 0.94 and 0.98) were flagged. The thresholds were set from these numbers, so this is a sanity check, not an accuracy measurement; real HOD / Bhumi drawings will be the real test.
+
 ## 2. Roadmap items ticked so far
 
 See `PROJECT_ROADMAP.md`. Items are ticked only when the work exists and was checked. Items completed in earlier work by the prototype (setup, first data, CLIP model, cross-generator test) were ticked on 14 Oct with a pointer to Walkthrough 01.

@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from detector import Detector  # noqa: E402
 from forensics import (SUPPORTED_TYPES, ImageLoadError, ela_image, load_image,  # noqa: E402
                        read_metadata, spectral_peak_score, spectrum_image)
+from imagetype import notices as image_notes  # noqa: E402
 from trust import explain, heatmap_overlay, peak_threshold, trust_score, verdict  # noqa: E402
 
 HERE = Path(__file__).parent
@@ -42,8 +43,10 @@ def model_picker() -> str:
     return key
 
 
-def score_card(score: int, p_fake: float, bands=None) -> None:
+def score_card(score: int, p_fake: float, bands=None, force_review: bool = False) -> None:
     v = verdict(score, bands)
+    if force_review and v.label != "Needs Human Review":
+        v = verdict(50, (101, -1))      # same card, but 'Needs Human Review' (image is outside what the detector was built for)
     st.markdown(
         f"""
 <div style="border:2px solid {v.colour}; border-radius:14px; padding:18px 22px; background:{v.colour}14;">
@@ -89,12 +92,16 @@ def page_check() -> None:
         peak = spectral_peak_score(loaded.rgb)
         meta = read_metadata(loaded)
     score = trust_score(result.probability)
+    notes = image_notes(loaded.rgb, meta)
+    force_review = any(n.kind == "graphic" for n in notes)
 
     left, right = st.columns([1.15, 1])
     with left:
         st.image(loaded.rgb, caption=f"{name} · {meta['format']} · {meta['size']} px", width="stretch")
     with right:
-        score_card(score, result.probability, result.head.bands)
+        score_card(score, result.probability, result.head.bands, force_review)
+        for n in notes:
+            st.warning(n.text)
         st.markdown("#### Why?")
         for line in explain(result.probability, result.grid, peak, meta):
             st.markdown(f"- {line}")
