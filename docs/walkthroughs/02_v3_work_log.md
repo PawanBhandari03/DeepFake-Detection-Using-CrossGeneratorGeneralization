@@ -341,6 +341,29 @@ The HOD tried a hand-made Paint drawing: Trust 45, Needs Human Review. Drawings 
 - **Messaging-app file:** JPEG, no EXIF, long side 1200-1300 px. Notice only (heuristic, worded "may have been").
 - **Checked for false alarms:** none of the 30 full-size team photos (real, ChatGPT, Gemini; flat share up to 0.78, at least 6849 colours) and none of the 44 sample test images were flagged as graphic. Two synthetic doodles (flat share 0.94 and 0.98) were flagged. The thresholds were set from these numbers, so this is a sanity check, not an accuracy measurement; real HOD / Bhumi drawings will be the real test.
 
+### Entry 34 — 12 Nov · Gemini fine-tune experiment (rejected) and Rahul's phone-photo pairs
+
+**Experiment.** Goal: improve Gemini-edit detection by adding matched (real photo, Gemini edit) pairs to the v3 head (frozen CLIP, logistic head only). Data: 150 pairs from Apple's Pico-Banana-400K (Nano-Banana edits of Open Images photos; CC BY-NC-ND 4.0, research use; originals fetched from the Open Images copy because Flickr blocked downloads). Script: `prototype/gemini_finetune.py`; accept rules were fixed before the run. Result: `prototype/results/gemini_pico_finetune.json`.
+
+| Check | v3 | v3 + 150 pairs |
+|---|---|---|
+| Held-out Pico pairs (5-fold by pair), AUC | 0.748 | 0.941 |
+| OpenFake clean AUC | 0.9821 | 0.9902 |
+| Team test (10 real + 10 ChatGPT + 10 Gemini), AUC | 0.890 | 0.875 |
+| Real photos called AI (team test) | 1 | 1 |
+
+Decision: **REJECT, keep v3** (rule "AUC on the untouched team test must not drop" failed; the drop is about one or two images out of 30, so it is within noise, but the rule was set in advance and is not relaxed). Reading: the gain is large on Pico-style pairs but did not carry over to phone photos, likely because the Pico real images are web photos. No weights were changed.
+
+**Rahul's pairs (matched by eye).** 22 Gemini images paired with their source photos. 12 pairs have a full-size camera original (EXIF, 3072x4096 or 4000x3000) on the real side; the other 10 have WhatsApp/Snapchat copies, screenshots or an AI image as the "real" side and are not used for the accuracy figure. Per-image scores: `prototype/results/rahul_pairs_check.json`.
+
+- 12 clean pairs, v3: AUC real vs Gemini **0.986**; the edit scored more AI-like than its original in 12 of 12 pairs.
+- Real photos: 11 Authentic, 1 Needs Human Review, 0 called AI.
+- Gemini edits: 6 AI, 5 Needs Human Review, 1 Authentic.
+- Together with the team test: 22 Gemini edits of full-size phone photos vs their 22 originals, AUC **0.913**. Gemini is therefore detected better than the first team test (AUC 0.83 alone) suggested, but not as well as ChatGPT (0.95); about half of the edits still land in Needs Human Review.
+- The 10 other pairs are shown for information only: for example one real-side WhatsApp copy (960x1280) was called AI, and screenshots/posters fall in the new "not a camera photo" notice.
+
+Limits: small samples (12 and 10 pairs), single-person photo sets, one Gemini version. The numbers are indicative, not exact.
+
 ## 2. Roadmap items ticked so far
 
 See `PROJECT_ROADMAP.md`. Items are ticked only when the work exists and was checked. Items completed in earlier work by the prototype (setup, first data, CLIP model, cross-generator test) were ticked on 14 Oct with a pointer to Walkthrough 01.

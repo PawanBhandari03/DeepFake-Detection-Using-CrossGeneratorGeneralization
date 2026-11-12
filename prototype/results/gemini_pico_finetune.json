@@ -1,0 +1,45 @@
+{
+ "n_pairs": 150,
+ "weight": 30.0,
+ "loo": {
+  "10.0": {
+   "auc": 0.8769,
+   "pairs_edit_more_ai": 142
+  },
+  "30.0": {
+   "auc": 0.9409,
+   "pairs_edit_more_ai": 148
+  }
+ },
+ "v3_on_same_pairs": {
+  "auc": 0.7476,
+  "pairs_edit_more_ai": 117
+ },
+ "openfake_clean_auc": {
+  "v3": 0.9821,
+  "new": 0.9902
+ },
+ "test_set": {
+  "v3": {
+   "auc": 0.89,
+   "real_called_ai": 1,
+   "n_real": 10,
+   "edit_called_ai": 13,
+   "n_edit": 20
+  },
+  "new": {
+   "auc": 0.875,
+   "real_called_ai": 1,
+   "n_real": 10,
+   "edit_called_ai": 15,
+   "n_edit": 20
+  }
+ },
+ "rules": {
+  "loo_auc_gain>=0.05": true,
+  "openfake_drop<=0.005": true,
+  "test_real_called_ai_not_higher": true,
+  "test_auc_not_lower": false
+ },
+ "decision": "REJECT (keep v3)"
+}

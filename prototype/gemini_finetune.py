@@ -41,7 +41,7 @@ WEIGHT_GRID = (10.0, 30.0)
 LOO_BASE_PATCHES = 150_000          # base-data subsample used only inside leave-one-out (speed)
 
 
-def encode_folder(det, root: Path, cache: Path) -> dict:
+def encode_folder(det, root: Path, cache: Path, max_pairs: int | None = None) -> dict:
     """{kind: {stem: (10, 768) L2-normalised features}} with a disk cache."""
     if cache.exists():
         z = np.load(cache, allow_pickle=True)
@@ -50,6 +50,8 @@ def encode_folder(det, root: Path, cache: Path) -> dict:
     out = {}
     for kind in KINDS:
         files = sorted(glob.glob(str(root / kind / "*.*")))
+        if max_pairs:
+            files = files[:max_pairs]
         if not files:
             continue
         out[kind] = {}
@@ -99,13 +101,14 @@ def main():
     ap.add_argument("--test", required=True)
     ap.add_argument("--out", default=str(RESULTS / "gemini_finetune.json"))
     ap.add_argument("--cache", default=str(Path(__file__).parent / "_cache"))
+    ap.add_argument("--max-pairs", type=int, default=None, help="use only the first N pairs of --pairs")
     ap.add_argument("--no-save", action="store_true", help="dry run: never write weights")
     a = ap.parse_args()
     cache = Path(a.cache)
     cache.mkdir(exist_ok=True)
 
     det = D.Detector()
-    train = encode_folder(det, Path(a.pairs), cache / (Path(a.pairs).name + "_feats.npz"))
+    train = encode_folder(det, Path(a.pairs), cache / (Path(a.pairs).name + f"_{a.max_pairs}_feats.npz"), a.max_pairs)
     test = encode_folder(det, Path(a.test), cache / (Path(a.test).name + "_feats.npz"))
     stems = sorted(set(train["real"]) & set(train.get("gemini", {})))
     print(f"{len(stems)} matched Gemini pairs for training/LOO", flush=True)
@@ -142,14 +145,17 @@ def main():
     sub = rng.permutation(len(yb))[:LOO_BASE_PATCHES]
     Xs, ys = Xb[sub], yb[sub]
     loo = {}
+    # leave-one-pair-out for small sets, 5-fold grouped by pair for larger sets (every pair is still held out once)
+    folds = [[s] for s in stems] if len(stems) <= 30 else [list(f) for f in np.array_split(np.array(stems), 5)]
     for W in WEIGHT_GRID:
-        real_l, edit_l = [], []
-        for s in stems:
-            Xn, yn = new_rows([t for t in stems if t != s])
+        lg = {}
+        for fold in folds:
+            Xn, yn = new_rows([t for t in stems if t not in fold])
             w, b = fit(np.concatenate([Xs, Xn]), np.concatenate([ys, yn]), C,
                        np.concatenate([np.ones(len(ys)), np.full(len(yn), W)]))
-            real_l.append(img_logit(train["real"][s], w, b))
-            edit_l.append(img_logit(train["gemini"][s], w, b))
+            for s in fold:
+                lg[s] = (img_logit(train["real"][s], w, b), img_logit(train["gemini"][s], w, b))
+        real_l = [lg[s][0] for s in stems]; edit_l = [lg[s][1] for s in stems]
         auc = roc_auc_score([0] * len(stems) + [1] * len(stems), real_l + edit_l)
         wins = int(sum(e > r for r, e in zip(real_l, edit_l)))
         loo[W] = {"auc": round(float(auc), 4), "pairs_edit_more_ai": wins}

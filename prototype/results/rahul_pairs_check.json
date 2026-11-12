@@ -1,0 +1,354 @@
+[
+ {
+  "pair": "0",
+  "clean": true,
+  "real_file": "20250919_100820.jpg",
+  "gem_file": "1794487602244.png",
+  "real": {
+   "logit": -1.7488406896591187,
+   "trust": 87,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 0.384413480758667,
+   "trust": 21,
+   "verdict": "Review"
+  }
+ },
+ {
+  "pair": "1",
+  "clean": true,
+  "real_file": "20251014_131853.jpg",
+  "gem_file": "1794487456293.png",
+  "real": {
+   "logit": -1.3684313297271729,
+   "trust": 79,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 2.35673189163208,
+   "trust": 1,
+   "verdict": "AI"
+  }
+ },
+ {
+  "pair": "2",
+  "clean": true,
+  "real_file": "20251015_141402.jpg",
+  "gem_file": "1794487310266.png",
+  "real": {
+   "logit": -0.15034572780132294,
+   "trust": 38,
+   "verdict": "Review"
+  },
+  "gemini": {
+   "logit": 1.0884032249450684,
+   "trust": 9,
+   "verdict": "AI"
+  }
+ },
+ {
+  "pair": "3",
+  "clean": true,
+  "real_file": "20251127_101214.jpg",
+  "gem_file": "1794487121044.png",
+  "real": {
+   "logit": -1.596333384513855,
+   "trust": 84,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 0.06795203685760498,
+   "trust": 30,
+   "verdict": "Review"
+  }
+ },
+ {
+  "pair": "4",
+  "clean": true,
+  "real_file": "20260221_184551.jpg",
+  "gem_file": "1794486442826.png",
+  "real": {
+   "logit": -2.1666417121887207,
+   "trust": 93,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 0.5738450884819031,
+   "trust": 17,
+   "verdict": "AI"
+  }
+ },
+ {
+  "pair": "5",
+  "clean": true,
+  "real_file": "20260401_113834.jpg",
+  "gem_file": "1794486038534.png",
+  "real": {
+   "logit": -1.174966812133789,
+   "trust": 74,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 1.2079588174819946,
+   "trust": 7,
+   "verdict": "AI"
+  }
+ },
+ {
+  "pair": "6",
+  "clean": true,
+  "real_file": "20260409_092325.jpg",
+  "gem_file": "1794485934101.png",
+  "real": {
+   "logit": -1.482064127922058,
+   "trust": 82,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 0.9718181490898132,
+   "trust": 10,
+   "verdict": "AI"
+  }
+ },
+ {
+  "pair": "7",
+  "clean": true,
+  "real_file": "20260502_033114.jpg",
+  "gem_file": "1794485843710.png",
+  "real": {
+   "logit": -2.0318408012390137,
+   "trust": 91,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": -0.8148077726364136,
+   "trust": 63,
+   "verdict": "Authentic"
+  }
+ },
+ {
+  "pair": "8",
+  "clean": true,
+  "real_file": "20260622_185445.jpg",
+  "gem_file": "1794485764619.png",
+  "real": {
+   "logit": -1.6113113164901733,
+   "trust": 85,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": -0.115056611597538,
+   "trust": 37,
+   "verdict": "Review"
+  }
+ },
+ {
+  "pair": "9",
+  "clean": true,
+  "real_file": "20260711_203920.jpg",
+  "gem_file": "1794485695366.png",
+  "real": {
+   "logit": -1.7133800983428955,
+   "trust": 87,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 0.8608397245407104,
+   "trust": 12,
+   "verdict": "AI"
+  }
+ },
+ {
+  "pair": "10",
+  "clean": true,
+  "real_file": "20261026_200834.jpg",
+  "gem_file": "1794485371508.png",
+  "real": {
+   "logit": -1.239774465560913,
+   "trust": 76,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": -0.5141624808311462,
+   "trust": 51,
+   "verdict": "Review"
+  }
+ },
+ {
+  "pair": "11",
+  "clean": false,
+  "real_file": "IMG-20250204-WA0015.jpg",
+  "gem_file": "1794488151232.png",
+  "real": {
+   "logit": -0.933477520942688,
+   "trust": 67,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 0.855555534362793,
+   "trust": 12,
+   "verdict": "AI"
+  }
+ },
+ {
+  "pair": "12",
+  "clean": false,
+  "real_file": "IMG-20250422-WA0005.jpeg",
+  "gem_file": "1794488032842.png",
+  "real": {
+   "logit": -1.5578984022140503,
+   "trust": 84,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 0.2057230919599533,
+   "trust": 26,
+   "verdict": "Review"
+  }
+ },
+ {
+  "pair": "13",
+  "clean": false,
+  "real_file": "IMG-20250726-WA0024.jpeg",
+  "gem_file": "1794487867693.png",
+  "real": {
+   "logit": -2.6590120792388916,
+   "trust": 96,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": -1.3210653066635132,
+   "trust": 78,
+   "verdict": "Authentic"
+  }
+ },
+ {
+  "pair": "14",
+  "clean": false,
+  "real_file": "IMG-20250902-WA0227.jpg",
+  "gem_file": "1794487748349.png",
+  "real": {
+   "logit": -2.4507908821105957,
+   "trust": 95,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 1.2684319019317627,
+   "trust": 7,
+   "verdict": "AI"
+  }
+ },
+ {
+  "pair": "15",
+  "clean": false,
+  "real_file": "IMG-20251202-WA0019.jpg",
+  "gem_file": "1794486595966.png",
+  "real": {
+   "logit": 0.6749681234359741,
+   "trust": 15,
+   "verdict": "AI"
+  },
+  "gemini": {
+   "logit": 1.3372360467910767,
+   "trust": 6,
+   "verdict": "AI"
+  }
+ },
+ {
+  "pair": "16",
+  "clean": false,
+  "real_file": "IMG-20260222-WA0012.jpg",
+  "gem_file": "1794486160396.png",
+  "real": {
+   "logit": -0.6352981328964233,
+   "trust": 56,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 2.8881096839904785,
+   "trust": 1,
+   "verdict": "AI"
+  }
+ },
+ {
+  "pair": "17",
+  "clean": false,
+  "real_file": "IMG-20260925-WA0002.jpg",
+  "gem_file": "1794485488156.png",
+  "real": {
+   "logit": -2.0949902534484863,
+   "trust": 92,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 0.23044559359550476,
+   "trust": 26,
+   "verdict": "Review"
+  }
+ },
+ {
+  "pair": "18",
+  "clean": true,
+  "real_file": "IMG20251127130638.jpg",
+  "gem_file": "1794487028436.png",
+  "real": {
+   "logit": -0.8794681429862976,
+   "trust": 65,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 0.17644599080085754,
+   "trust": 27,
+   "verdict": "Review"
+  }
+ },
+ {
+  "pair": "19",
+  "clean": false,
+  "real_file": "Snapchat-1757098927.jpg",
+  "gem_file": "1794486521504.png",
+  "real": {
+   "logit": -0.035114385187625885,
+   "trust": 34,
+   "verdict": "Review"
+  },
+  "gemini": {
+   "logit": 0.2754155099391937,
+   "trust": 24,
+   "verdict": "Review"
+  }
+ },
+ {
+  "pair": "20",
+  "clean": false,
+  "real_file": "Snapchat-767885830.jpg",
+  "gem_file": "1794487199120.png",
+  "real": {
+   "logit": -1.6368846893310547,
+   "trust": 85,
+   "verdict": "Authentic"
+  },
+  "gemini": {
+   "logit": 0.3898126482963562,
+   "trust": 21,
+   "verdict": "Review"
+  }
+ },
+ {
+  "pair": "21",
+  "clean": false,
+  "real_file": "file_0000000095e081f8993024ed6a1c9509.png",
+  "gem_file": "1794485618840.png",
+  "real": {
+   "logit": -0.06878457218408585,
+   "trust": 35,
+   "verdict": "Review"
+  },
+  "gemini": {
+   "logit": 1.6067607402801514,
+   "trust": 4,
+   "verdict": "AI"
+  }
+ }
+]
