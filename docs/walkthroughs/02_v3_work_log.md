@@ -364,6 +364,18 @@ Decision: **REJECT, keep v3** (rule "AUC on the untouched team test must not dro
 
 Limits: small samples (12 and 10 pairs), single-person photo sets, one Gemini version. The numbers are indicative, not exact.
 
+### Entry 35 — 12 Nov · Bhumi's 30 phone photos and their Gemini edits; combined Gemini result
+
+Bhumi supplied 30 real phone photos (about 12 MP, EXIF, full size) and 30 Gemini files. Checked by eye and by file hash: Gemini files 24-27 are untouched copies of real files (24, 25 = photos; 26, 27 = plain graphics), not edits, so they are excluded from the Gemini side. Pairs 01-23 and 28-30 match by number. Scores: `prototype/results/bhumi_pairs_check.json` (v3 head, unchanged).
+
+- **25 photo pairs (01-23, 28, 29):** AUC real vs Gemini **0.928**; the edit scored more AI-like than its original in 25 of 25 pairs.
+- Real photos (25): 18 Authentic, 7 Needs Human Review, 0 called AI. All 27 real photos in the set: 20 Authentic, 7 Review, 0 AI.
+- Gemini edits (25): 7 AI, 16 Needs Human Review, 2 Authentic.
+- **Combined Gemini result over three independent sets** (friend 10 + Rahul 12 + Bhumi 25 = 47 pairs): AUC **0.918**. Real photos: 38 Authentic, 8 Review, 1 called AI. Gemini edits: 14 AI, 28 Review, 5 Authentic.
+- **Drawing/graphic notice (graphics: real 26, 27, 30 and Gemini 30):** the notice fired on real 27 (gradient), real 30 and Gemini 30; it did not fire on real 26 (black screen with white shapes, Review anyway, Trust 42). It fired on none of the 50 photos (25 real, 25 Gemini), so there were no false notices on photos here. Real 27 would otherwise have been called Authentic (Trust 72); the notice forces Needs Human Review.
+
+Limits: photos are mostly objects and rooms, taken by few people, all with one phone family; one Gemini version; small samples. Numbers are indicative.
+
 ## 2. Roadmap items ticked so far
 
 See `PROJECT_ROADMAP.md`. Items are ticked only when the work exists and was checked. Items completed in earlier work by the prototype (setup, first data, CLIP model, cross-generator test) were ticked on 14 Oct with a pointer to Walkthrough 01.

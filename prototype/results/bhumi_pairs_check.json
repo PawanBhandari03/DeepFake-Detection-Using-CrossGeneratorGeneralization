@@ -1,0 +1,680 @@
+[
+ {
+  "kind": "real",
+  "n": "01",
+  "size": [
+   3072,
+   4096
+  ],
+  "logit": -0.7134177088737488,
+  "trust": 59,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "02",
+  "size": [
+   3072,
+   4096
+  ],
+  "logit": 0.252462774515152,
+  "trust": 25,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "03",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -1.9506975412368774,
+  "trust": 90,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "04",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -1.9405982494354248,
+  "trust": 90,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "05",
+  "size": [
+   3072,
+   4096
+  ],
+  "logit": -0.4694077968597412,
+  "trust": 50,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "06",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -1.6971718072891235,
+  "trust": 86,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "07",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -0.3293324112892151,
+  "trust": 44,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "08",
+  "size": [
+   4080,
+   3072
+  ],
+  "logit": -0.6651127934455872,
+  "trust": 57,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "09",
+  "size": [
+   4080,
+   3072
+  ],
+  "logit": -1.2782526016235352,
+  "trust": 77,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "10",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -1.4974980354309082,
+  "trust": 82,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "11",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -1.1021589040756226,
+  "trust": 72,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "12",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -1.5050376653671265,
+  "trust": 83,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "13",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -1.2152506113052368,
+  "trust": 75,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "14",
+  "size": [
+   4080,
+   3072
+  ],
+  "logit": -0.5694245100021362,
+  "trust": 53,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "15",
+  "size": [
+   4080,
+   3072
+  ],
+  "logit": -1.0302664041519165,
+  "trust": 70,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "16",
+  "size": [
+   4080,
+   3072
+  ],
+  "logit": -1.5711252689361572,
+  "trust": 84,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "17",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -1.7135940790176392,
+  "trust": 87,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "18",
+  "size": [
+   3072,
+   3072
+  ],
+  "logit": -0.08861575275659561,
+  "trust": 36,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "19",
+  "size": [
+   3072,
+   4096
+  ],
+  "logit": -0.6740900278091431,
+  "trust": 57,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "20",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -1.1591521501541138,
+  "trust": 74,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "21",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -1.4462753534317017,
+  "trust": 81,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "22",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -2.10514235496521,
+  "trust": 92,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "23",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -0.883444607257843,
+  "trust": 65,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "24",
+  "size": [
+   3072,
+   4096
+  ],
+  "logit": -0.5767874121665955,
+  "trust": 54,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "25",
+  "size": [
+   3072,
+   4096
+  ],
+  "logit": -0.658899188041687,
+  "trust": 57,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "26",
+  "size": [
+   1440,
+   1920
+  ],
+  "logit": -0.2565220296382904,
+  "trust": 42,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "27",
+  "size": [
+   2048,
+   2048
+  ],
+  "logit": -1.100609302520752,
+  "trust": 72,
+  "verdict": "Authentic",
+  "notices": [
+   "graphic"
+  ]
+ },
+ {
+  "kind": "real",
+  "n": "28",
+  "size": [
+   1440,
+   1920
+  ],
+  "logit": -0.16228966414928436,
+  "trust": 38,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "29",
+  "size": [
+   3072,
+   4080
+  ],
+  "logit": -0.30169427394866943,
+  "trust": 43,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "real",
+  "n": "30",
+  "size": [
+   1440,
+   1920
+  ],
+  "logit": -0.5269673466682434,
+  "trust": 52,
+  "verdict": "Review",
+  "notices": [
+   "graphic"
+  ]
+ },
+ {
+  "kind": "gemini",
+  "n": "01",
+  "size": [
+   1792,
+   2390
+  ],
+  "logit": 0.3638295531272888,
+  "trust": 22,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "02",
+  "size": [
+   1792,
+   2400
+  ],
+  "logit": 0.9005953073501587,
+  "trust": 11,
+  "verdict": "AI",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "03",
+  "size": [
+   1792,
+   2400
+  ],
+  "logit": -0.5201463103294373,
+  "trust": 52,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "04",
+  "size": [
+   1792,
+   2400
+  ],
+  "logit": 0.2680462896823883,
+  "trust": 24,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "05",
+  "size": [
+   1792,
+   2400
+  ],
+  "logit": 0.22723230719566345,
+  "trust": 26,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "06",
+  "size": [
+   1792,
+   2380
+  ],
+  "logit": 0.0950666218996048,
+  "trust": 30,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "07",
+  "size": [
+   1792,
+   2400
+  ],
+  "logit": 0.6850627660751343,
+  "trust": 15,
+  "verdict": "AI",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "08",
+  "size": [
+   2400,
+   1792
+  ],
+  "logit": 0.24604113399982452,
+  "trust": 25,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "09",
+  "size": [
+   2400,
+   1792
+  ],
+  "logit": 0.6656513214111328,
+  "trust": 15,
+  "verdict": "AI",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "10",
+  "size": [
+   1792,
+   2380
+  ],
+  "logit": 0.2589128613471985,
+  "trust": 25,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "11",
+  "size": [
+   1792,
+   2380
+  ],
+  "logit": 0.4483059048652649,
+  "trust": 20,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "12",
+  "size": [
+   1792,
+   2380
+  ],
+  "logit": -0.1875133514404297,
+  "trust": 39,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "13",
+  "size": [
+   1792,
+   2400
+  ],
+  "logit": -0.5137731432914734,
+  "trust": 51,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "14",
+  "size": [
+   2400,
+   1792
+  ],
+  "logit": -0.1482420265674591,
+  "trust": 38,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "15",
+  "size": [
+   2400,
+   1792
+  ],
+  "logit": 0.5591295957565308,
+  "trust": 17,
+  "verdict": "AI",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "16",
+  "size": [
+   2400,
+   1792
+  ],
+  "logit": -0.06902997195720673,
+  "trust": 35,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "17",
+  "size": [
+   1792,
+   2380
+  ],
+  "logit": -0.6391531229019165,
+  "trust": 56,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "18",
+  "size": [
+   2048,
+   2048
+  ],
+  "logit": 0.5623728632926941,
+  "trust": 17,
+  "verdict": "AI",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "19",
+  "size": [
+   1792,
+   2400
+  ],
+  "logit": -0.5204035043716431,
+  "trust": 52,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "20",
+  "size": [
+   1792,
+   2400
+  ],
+  "logit": -0.31644970178604126,
+  "trust": 44,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "21",
+  "size": [
+   1792,
+   2400
+  ],
+  "logit": 0.5245028138160706,
+  "trust": 18,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "22",
+  "size": [
+   1792,
+   2400
+  ],
+  "logit": -0.6204413175582886,
+  "trust": 55,
+  "verdict": "Authentic",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "23",
+  "size": [
+   1792,
+   2400
+  ],
+  "logit": 0.5618622899055481,
+  "trust": 17,
+  "verdict": "AI",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "28",
+  "size": [
+   1792,
+   2390
+  ],
+  "logit": 0.46937838196754456,
+  "trust": 19,
+  "verdict": "Review",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "29",
+  "size": [
+   1792,
+   2400
+  ],
+  "logit": 0.560944676399231,
+  "trust": 17,
+  "verdict": "AI",
+  "notices": []
+ },
+ {
+  "kind": "gemini",
+  "n": "30",
+  "size": [
+   1792,
+   2390
+  ],
+  "logit": 0.16064921021461487,
+  "trust": 28,
+  "verdict": "Review",
+  "notices": [
+   "graphic"
+  ]
+ }
+]
