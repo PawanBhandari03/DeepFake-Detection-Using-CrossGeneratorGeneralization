@@ -376,6 +376,16 @@ Bhumi supplied 30 real phone photos (about 12 MP, EXIF, full size) and 30 Gemini
 
 Limits: photos are mostly objects and rooms, taken by few people, all with one phone family; one Gemini version; small samples. Numbers are indicative.
 
+### Entry 36 — 12 Nov · Visible Gemini watermark check
+
+Gemini-app downloads carry a small sparkle (four-point star, about 93 px wide) at a fixed place near the bottom-right corner (centre about 113 px from the right and bottom edges, same size at 1792, 2048 and 2400 px). `prototype/imagetype.py` now has `gemini_sparkle()`: the corner is high-pass filtered and matched against a template (`prototype/weights/gemini_sparkle_template.npy`, the mean corner of Bhumi's 26 Gemini images) at small shifts; a correlation of at least 0.25 counts as "watermark found". When found, the app shows an alert and the verdict is Likely AI-generated; the detector score is still shown. This is a provenance marker like the metadata markers; it is not detector evidence and is reported separately.
+
+- **Detection, held-out sets** (template not built from them): friend 10 of 10, Rahul 21 of 22 (the one miss is a poster/graphic image, not one of the 12 clean pairs). Bhumi 26 of 26 (template source, so in-sample).
+- **All 47 clean Gemini edits** (friend 10 + Rahul 12 + Bhumi 25): watermark found in 47 of 47.
+- **False alarms:** 0 of 62 real phone photos, 0 of 10 ChatGPT edits, 0 of 60 Pico-Banana images (made through the API) crossed the threshold; the highest score among them was 0.12.
+- **What it does not cover:** Gemini images from the API or other routes carry no visible sparkle (0 of 60 Pico images had it), and the mark can be cropped out. Model-only accuracy is unchanged: AUC 0.918 over the 47 pairs, 14 of 47 flagged AI. The app's verdict for a watermarked Gemini image is AI because of the mark, so model accuracy and mark-based detection must be reported separately.
+- Verdict-band change (raising the AI cut-off from 17 to 25-30) was examined: on the 94 phone images it flags more Gemini edits as AI (14 to 24 of 47 at 25) at the cost of about one more real photo (1 to 2 of 47), but on web photos the real false-alarm rate rises from about 3-5% to about 6-8%. Not adopted: with the watermark check the extra benefit is small.
+
 ## 2. Roadmap items ticked so far
 
 See `PROJECT_ROADMAP.md`. Items are ticked only when the work exists and was checked. Items completed in earlier work by the prototype (setup, first data, CLIP model, cross-generator test) were ticked on 14 Oct with a pointer to Walkthrough 01.

@@ -43,8 +43,11 @@ def model_picker() -> str:
     return key
 
 
-def score_card(score: int, p_fake: float, bands=None, force_review: bool = False) -> None:
+def score_card(score: int, p_fake: float, bands=None, force_review: bool = False, watermark: bool = False) -> None:
     v = verdict(score, bands)
+    if watermark:
+        v = verdict(0, (101, 100))      # visible Gemini watermark: the file itself says it is AI-made
+        v.advice = "A visible Gemini watermark was found (see the note below). The detector score is shown for reference."
     if force_review and v.label != "Needs Human Review":
         v = verdict(50, (101, -1))      # same card, but 'Needs Human Review' (image is outside what the detector was built for)
     st.markdown(
@@ -93,15 +96,16 @@ def page_check() -> None:
         meta = read_metadata(loaded)
     score = trust_score(result.probability)
     notes = image_notes(loaded.rgb, meta)
-    force_review = any(n.kind == "graphic" for n in notes)
+    watermark = any(n.kind == "watermark" for n in notes)
+    force_review = any(n.kind == "graphic" for n in notes) and not watermark
 
     left, right = st.columns([1.15, 1])
     with left:
         st.image(loaded.rgb, caption=f"{name} · {meta['format']} · {meta['size']} px", width="stretch")
     with right:
-        score_card(score, result.probability, result.head.bands, force_review)
+        score_card(score, result.probability, result.head.bands, force_review, watermark)
         for n in notes:
-            st.warning(n.text)
+            (st.error if n.kind == "watermark" else st.warning)(n.text)
         st.markdown("#### Why?")
         for line in explain(result.probability, result.grid, peak, meta):
             st.markdown(f"- {line}")
