@@ -20,17 +20,12 @@
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.misc,calc,fit,backgrounds,decorations.pathreplacing}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.misc,shapes.multipart,calc,fit,backgrounds,decorations.pathreplacing}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.16}
 \usepackage{pgfgantt}
 
-% ---- colours (also readable in black and white) ----------------------------
-\definecolor{cBlue}{HTML}{DCE8F5}
-\definecolor{cGreen}{HTML}{DDEEDD}
-\definecolor{cOrange}{HTML}{FBE5CC}
-\definecolor{cGrey}{HTML}{EEEEEE}
-\definecolor{cLine}{HTML}{333333}
+\input{tikzstyles}
 
 % ---- page style: footer as in the department's report format -----------------
 \newcommand{\FooterText}{BSIOTR, Department of Computer Engineering, \AcademicYearShort}
@@ -53,23 +48,6 @@
 \setlist{itemsep=2pt,topsep=3pt}
 \renewcommand{\arraystretch}{1.18}
 \setlength{\emergencystretch}{3em}
-
-% ---- TikZ styles shared by all diagrams ----------------------------------------
-\tikzset{
-  >=Stealth,
-  box/.style={rectangle,rounded corners=2pt,draw=cLine,thick,fill=cBlue,align=center,
-              minimum height=9mm,inner sep=4pt,font=\small},
-  boxg/.style={box,fill=cGreen},
-  boxo/.style={box,fill=cOrange},
-  boxw/.style={box,fill=white},
-  designed/.style={box,fill=white,dashed},
-  store/.style={rectangle,draw=cLine,thick,fill=cGrey,align=center,minimum height=8mm,inner sep=4pt,font=\small},
-  actor/.style={rectangle,draw=cLine,thick,fill=cOrange,align=center,minimum height=8mm,inner sep=4pt,font=\small},
-  usecase/.style={ellipse,draw=cLine,thick,fill=cBlue,align=center,font=\footnotesize,inner sep=2pt,minimum height=8mm},
-  proc/.style={circle,draw=cLine,thick,fill=cBlue,align=center,font=\footnotesize,inner sep=2pt},
-  arr/.style={->,thick,draw=cLine},
-  darr/.style={->,thick,draw=cLine,dashed},
-}
 
 % ---- helper: include a figure file only if it exists (keeps the build alive) ---
 \newcommand{\OptionalGraphic}[2][width=\linewidth]{%

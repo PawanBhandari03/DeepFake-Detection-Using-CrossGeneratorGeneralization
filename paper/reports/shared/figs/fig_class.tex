@@ -1,0 +1,23 @@
+% Class diagram of the main software components (names follow the prototype code)
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[uml/.style={rectangle split,rectangle split parts=3,draw=cLine,thick,fill=cBlue,font=\footnotesize,align=left,text width=3.6cm,inner sep=3pt}]
+\node[uml] (router) at (0,0) {\textbf{ContentRouter}\nodepart{second}type, size limit\nodepart{third}validate(file)\\route(file)};
+\node[uml,fill=cGrey] (an) at (6.2,0) {\textbf{Analyser}\;(interface)\nodepart{second}name\nodepart{third}analyse(file): Evidence};
+\node[uml,fill=cOrange] (ev) at (12.4,0) {\textbf{Evidence}\nodepart{second}score, visual\\cues, flags\nodepart{third}};
+\node[uml,fill=cGreen] (img) at (0,-4.2) {\textbf{ImageAnalyser}\nodepart{second}patches (10), grid\\JPEG quality 95\nodepart{third}analyse(image)};
+\node[uml,dashed,fill=white] (vid) at (6.2,-4.2) {\textbf{VideoAnalyser}\;(designed)\nodepart{second}frame rate, face margin\nodepart{third}analyse(video)};
+\node[uml,dashed,fill=white] (doc) at (12.4,-4.2) {\textbf{DocumentAnalyser}\;(designed)\nodepart{second}OCR, ELA, SRM, DCT\nodepart{third}analyse(document)};
+\node[uml] (clip) at (0,-8.4) {\textbf{ClipEncoder}\nodepart{second}ViT-L/14 (frozen)\nodepart{third}encode(patches)};
+\node[uml] (head) at (4.2,-8.4) {\textbf{LinearHead}\nodepart{second}$\mathbf{w}$, $b$, $C$\nodepart{third}logits(features)};
+\node[uml,fill=cOrange] (trust) at (8.4,-8.4) {\textbf{TrustEngine}\nodepart{second}$a$, $c$, bands (54, 17)\nodepart{third}trust\_score(p)\\verdict(T)};
+\node[uml,fill=cOrange] (rep) at (12.6,-8.4) {\textbf{ReportBuilder}\nodepart{second}evidence, metadata\nodepart{third}explain()\\report()};
+\draw[arr] (router) -- node[above,font=\scriptsize] {calls} (an);
+\draw[arr] (an) -- node[above,font=\scriptsize] {returns} (ev);
+\draw[-{Triangle[open]},thick,cLine] (img.north) -- ++(0,0.9) -| ([xshift=-0.8cm]an.south);
+\draw[-{Triangle[open]},thick,cLine] (vid.north) -- (an.south);
+\draw[-{Triangle[open]},thick,cLine] (doc.north) -- ++(0,0.9) -| ([xshift=0.8cm]an.south);
+\draw[arr] (img.south) -- ++(0,-0.6) -| (clip.north);
+\draw[arr] (img.south) -- ++(0,-0.6) -| (head.north);
+\draw[arr] (rep.east) -- ++(0.9,0) |- (ev.east);
+\draw[arr] (rep.west) -- (trust.east);
+\end{tikzpicture}}

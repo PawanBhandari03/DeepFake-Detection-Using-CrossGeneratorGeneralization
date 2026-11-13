@@ -1,0 +1,19 @@
+% Sequence diagram of one image check
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+\node[actor,minimum width=2.4cm] (u) at (0,0) {User};
+\node[box,minimum width=2.6cm,text width=2.4cm] (w) at (3.7,0) {Web interface (Streamlit)};
+\node[box,minimum width=2.6cm,text width=2.4cm] (r) at (7.4,0) {Validation and router};
+\node[boxg,minimum width=2.6cm,text width=2.4cm] (a) at (11.1,0) {Image analyser};
+\node[boxo,minimum width=2.6cm,text width=2.4cm] (s) at (14.8,0) {Scoring and explanation};
+\foreach \x in {0,3.7,7.4,11.1,14.8}{\draw[dashed,cLine] (\x,-0.7) -- (\x,-10.2);}
+\draw[arr] (0,-1.3) -- node[above,font=\scriptsize] {upload file} (3.7,-1.3);
+\draw[arr] (3.7,-2.5) -- node[above,font=\scriptsize] {file bytes} (7.4,-2.5);
+\node[font=\scriptsize,fill=white,draw=cLine,rounded corners=2pt] at (7.4,-3.5) {read type, check size, decode};
+\draw[arr] (7.4,-4.6) -- node[above,font=\scriptsize] {analyse(image)} (11.1,-4.6);
+\node[font=\scriptsize,fill=white,draw=cLine,rounded corners=2pt,text width=3.2cm,align=center] at (11.1,-5.8) {10 patches, JPEG q95, CLIP features, linear head, mean};
+\draw[darr] (11.1,-7.0) -- node[above,font=\scriptsize] {evidence record} (14.8,-7.0);
+\node[font=\scriptsize,fill=white,draw=cLine,rounded corners=2pt,text width=3.0cm,align=center] at (14.8,-8.0) {Platt scaling, Trust Score, verdict, sentences};
+\draw[darr] (14.8,-9.0) -- node[above,font=\scriptsize] {result} (3.7,-9.0);
+\draw[darr] (3.7,-10.0) -- node[above,font=\scriptsize] {card, heatmap, report} (0,-10.0);
+\end{tikzpicture}}

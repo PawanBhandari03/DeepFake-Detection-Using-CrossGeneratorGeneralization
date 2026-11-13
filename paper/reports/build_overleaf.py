@@ -67,7 +67,7 @@ def prepare_assets(raw_shots: Path | None) -> None:
 def copy_project(name: str, figs: list[str], need_refs: bool) -> Path:
     dst = HERE / name
     (dst / "figs").mkdir(parents=True, exist_ok=True)
-    for f in ("preamble.tex", "team.tex") + (("refs.tex",) if need_refs else ()):
+    for f in ("preamble.tex", "tikzstyles.tex", "team.tex") + (("refs.tex",) if need_refs else ()):
         shutil.copy(SHARED / f, dst / f)
     if (SHARED / "bsiotr_logo.png").exists():
         shutil.copy(SHARED / "bsiotr_logo.png", dst / "bsiotr_logo.png")

@@ -84,6 +84,24 @@ The user uploads a file and receives the score, the evidence and the report; the
   \caption{Use-case diagram.}\label{fig:uc}
 \end{figure}
 
+\section{Sequence Diagram}
+Fig.~\ref{fig:seq} shows the messages exchanged during one image check, from the upload to the result card.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_sequence}
+  \caption{Sequence diagram of one image check.}\label{fig:seq}
+\end{figure}
+
+\section{Class Diagram}
+The main software components and their relations are shown in Fig.~\ref{fig:class}. All analysers implement one interface and return an evidence record; the image analyser owns the CLIP encoder and the linear head; the trust engine turns the evidence into a score and a verdict, and the report builder writes the explanation.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_class}
+  \caption{Class diagram of the main components (dashed classes are designed).}\label{fig:class}
+\end{figure}
+
 \section{Screening Procedure}
 The screening procedure is shown as a flow chart in Fig.~\ref{fig:flow} and as steps below.
 

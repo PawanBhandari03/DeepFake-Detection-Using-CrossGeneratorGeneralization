@@ -36,6 +36,10 @@ The app screenshots (`app_*.png`) were captured from the running application on 
 
 Every result comes from the project files: `prototype/results/*.json`, `paper/analysis.json`, `docs/walkthroughs/02_v3_work_log.md` (Entries 30–36) and the research paper `paper/build_short_paper.py`. The references are the same 32 as in the research paper.
 
-## Not verified
+## Compiled PDFs and the presentation
 
-The LaTeX could not be compiled on the development laptop (no LaTeX installed), so the sources were checked statically (balanced braces and environments, all citations and labels resolve) but not by a compiler. If Overleaf shows an error, send the error line and it is a one-line fix.
+* `pdf/` holds the compiled PDFs (abstract 1 page, synopsis 12 pages, Stage 1 report 47 pages) and a PDF copy of the presentation. PDFs are not stored in git; rebuild them with any LaTeX (Overleaf, or Tectonic: `tectonic main.tex` inside each folder).
+* `presentation/Final_Project_Presentation.pptx` follows the department's sample deck exactly (same theme, logos, fonts, slide order) and has 42 slides with speaker notes on every slide. Rebuild: `python paper/reports/presentation/make_diagrams.py <tectonic.exe>` then `python paper/reports/presentation/build_pptx.py "<sample deck .pptx>"`.
+* The PRN / exam numbers on the title slide are blank brackets to fill in.
+
+All three LaTeX projects compile without errors (checked with Tectonic 0.17, 13 Nov 2026); only line-spacing warnings remain.
