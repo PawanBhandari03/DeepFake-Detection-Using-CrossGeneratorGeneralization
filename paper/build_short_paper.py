@@ -245,7 +245,7 @@ def build(with_refs: bool, out: Path):
     refs_html, nrefs = None, 0
     if with_refs:
         html, order = layout.number_citations(html, F.REFS)
-        refs_html = '<h2>REFERENCES</h2><div class="refs">' + "".join(f"<p>[{i}] {F.REFS[k]}</p>" for i, k in enumerate(order, start=1)) + "</div>"
+        refs_html = '<h2>REFERENCES</h2><div class="refs">' + "".join(f"<p>[{i}] <span style='color:#0b50c4'>{F.REFS[k]}</span></p>" for i, k in enumerate(order, start=1)) + "</div>"
         nrefs = len(order)
     else:
         html = layout.strip_citations(html)

@@ -268,7 +268,7 @@ for sh in s1.shapes:
         for r in pars[0].runs[2:]:
             r.text = ""
     elif sh.name.startswith("Subtitle"):
-        names = ["Pawan Singh Jagdish Bhandari (               )", "Rahul H. Bramhankar (               )", "Bhoomi Kushwah (72327349K)"]
+        names = ["Pawan Singh Jagdish Bhandari (72327345G)", "Rahul H. Bramhankar (72327655C)", "Bhoomi Kushwah (72327349K)"]
         for i, n in enumerate(names, start=1):
             set_par_text(pars[i], n)
         for p in pars[4:]:
