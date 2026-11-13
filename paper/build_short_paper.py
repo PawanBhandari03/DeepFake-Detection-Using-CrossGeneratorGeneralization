@@ -199,6 +199,45 @@ def head(named: bool) -> str:
     return f"<h1>{TITLE}</h1>{authors}<p class='abs'><b>Abstract&mdash;</b>{ABSTRACT}</p><p class='abs'><b>Index Terms&mdash;</b>{KEYWORDS}.</p>"
 
 
+def add_reference_links(pdf_path: Path, order: list) -> int:
+    """Make every reference in the list a clickable link. Text, colours and layout are not changed."""
+    import shutil
+    import pymupdf
+    from ref_links import REF_URLS
+    import re
+    doc = pymupdf.open(str(pdf_path))
+    page = doc[-1]
+    lines = []                                    # (rect, text) of every text line of the reference column
+    for blk in page.get_text("dict")["blocks"]:
+        for ln in blk.get("lines", []):
+            r = pymupdf.Rect(ln["bbox"])
+            if r.x0 > page.rect.width / 2 - 5:
+                lines.append((r, "".join(s["text"] for s in ln["spans"]).strip()))
+    lines.sort(key=lambda x: (round(x[0].y0), x[0].x0))
+    start = next((k for k, (r, s) in enumerate(lines) if s.upper().startswith("REFERENCES")), -1)
+    groups, cur = [], None
+    for r, s in lines[start + 1:]:
+        m = re.match(r"\[(\d+)\]", s)
+        if m:
+            cur = [int(m.group(1)), pymupdf.Rect(r)]
+            groups.append(cur)
+        elif cur is not None and r.y0 > page.rect.height - 60:
+            break                                  # footer line
+        elif cur is not None:
+            cur[1] |= r
+    done = 0
+    for num, rect in groups:
+        if 1 <= num <= len(order):
+            page.insert_link({"kind": pymupdf.LINK_URI, "from": rect, "uri": REF_URLS[order[num - 1]]})
+            done += 1
+    tmp = pdf_path.with_suffix(".tmp.pdf")
+    doc.ez_save(str(tmp))
+    doc.close()
+    shutil.copyfile(tmp, pdf_path)
+    tmp.unlink()
+    return done
+
+
 def build(with_refs: bool, out: Path):
     """with_refs=True: citation numbers in the text and the reference list in the right column of the last page.
     with_refs=False: same paper without any citation number and without the reference list (names are kept)."""
@@ -212,6 +251,9 @@ def build(with_refs: bool, out: Path):
         html = layout.strip_citations(html)
     meta = {"title": TITLE, "author": "The Perceptrons", "subject": "", "keywords": "", "creator": "", "producer": ""}
     n = layout.build_pdf(out, head(True), html, BLOCKS, CSS, HERE / "figures", FULL_WIDTH, "The Perceptrons \u2022 Research Paper", meta, refs_html=refs_html)
+    if with_refs:
+        linked = add_reference_links(out, order)
+        print(f"{linked} of {nrefs} references are clickable links")
     return n, nrefs
 
 
