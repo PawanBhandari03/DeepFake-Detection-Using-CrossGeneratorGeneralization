@@ -1,0 +1,20 @@
+% Data flow diagram, level 1
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+\node[actor,text width=2.0cm] (user) at (0,0) {User};
+\node[proc,minimum size=2.6cm,text width=2.1cm] (p1) at (4.0,0) {\textbf{1.0}\\Validate upload};
+\node[proc,minimum size=2.6cm,text width=2.1cm] (p2) at (8.2,0) {\textbf{2.0}\\Analyse with the routed analyser};
+\node[proc,minimum size=2.6cm,text width=2.1cm] (p3) at (12.4,0) {\textbf{3.0}\\Calibrate and score};
+\node[proc,minimum size=2.6cm,text width=2.1cm] (p4) at (12.4,-3.8) {\textbf{4.0}\\Explain and report};
+\node[store,text width=3.1cm] (d1) at (8.2,-2.6) {D1  Trained heads\\and CLIP encoder};
+\node[store,text width=3.1cm] (d2) at (8.2,-4.6) {D2  Calibration and\\verdict limits};
+\draw[arr] (user) -- node[above,font=\scriptsize] {file} (p1);
+\draw[arr] (p1) -- node[above,font=\scriptsize] {valid file} (p2);
+\draw[arr] (p2) -- node[above,font=\scriptsize] {evidence} (p3);
+\draw[arr] (p3) -- node[right,font=\scriptsize] {$T$, verdict} (p4);
+\draw[arr] (d1.north) -- (p2.south);
+\draw[arr] (d2.east) -- (p3.south west);
+\draw[arr] (p1.north) -- ++(0,1.5) node[above,font=\scriptsize] {error message} -| (user.north);
+\draw[arr] (p4.south) -- ++(0,-1.3) -| (user.south);
+\node[font=\scriptsize,align=center] at (6.2,-6.6) {Trust Score, verdict, heatmap, explanation, report};
+\end{tikzpicture}}

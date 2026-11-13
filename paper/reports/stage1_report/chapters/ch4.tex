@@ -1,0 +1,114 @@
+\chapter{System Design}
+
+\section{System Architecture}
+The system has a layered architecture (Fig.~\ref{fig:arch}). The web interface passes an upload to the validation layer, which reads the true file type from the bytes, checks the size and decodes the file. A router then calls the image, video or document analyser. Every analyser implements the same interface and returns an \emph{evidence record}: a score, a visual (heatmap, timeline or mask), numeric cues and flags raised by rules. The scoring layer calibrates the record into a probability and a Trust Score, and the explanation layer writes the sentences. Because the analysers only share this interface, a model can be replaced without touching the application, and the three phases of the project can be built one after the other.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_architecture}
+  \caption{Layered architecture. Solid boxes are implemented; dashed boxes are designed.}\label{fig:arch}
+\end{figure}
+
+\section{Training and Inference Are Separate}
+Heavy computation, such as extracting features from hundreds of thousands of patches, runs once on a free cloud GPU. The application loads the frozen encoder and a trained head of a few kilobytes and runs on a CPU. Loading only the image half of CLIP, tensor by tensor, keeps the peak memory near 1.5~GB. Fig.~\ref{fig:train} shows both sides.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_training}
+  \caption{Offline training workflow and online use of the trained model.}\label{fig:train}
+\end{figure}
+
+\section{Data Design}
+Features of the frozen encoder are computed once and stored with their label, source (the generator), view type and the kind of patch. Because features are stored, a new head or a new calibration costs minutes instead of hours.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Data used for the image analyser.}
+\begin{tabularx}{\linewidth}{@{}p{3.3cm}X@{}}
+\toprule
+Source & Use\\
+\midrule
+OpenFake \cite{openfake} & Real photographs and images from about sixty generators. Training, validation and test splits are made by generator; the test split contains generators that never appear in training (for example GPT-Image-1.5 and Nano Banana Pro)\\
+DiffSeg30k \cite{diffseg} and similar edit data & Patches of locally edited photographs with masks, used as extra training patches (a share is held out for testing)\\
+Degraded copies & Every training image also contributes a randomly resized, blurred and JPEG-compressed copy\\
+Team photographs & Full-size phone photographs taken by the team, their edits made with ChatGPT and Gemini; used only for testing\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+For the video and document phases the sources are FaceForensics++ and Celeb-DF (video) and clean public documents with synthetic forgeries, DocTamper and human-made forgeries (documents). Splits follow the unit of the problem: by generator for images, by video for video, by document for documents.
+
+\section{Design of the Image Analyser}
+The image is not resized, because resizing removes fine traces. Ten patches of $224\times224$ pixels (the centre and a $3\times3$ grid spread over the image) are cut at native resolution. Each patch is re-saved as a JPEG with quality 95, so that real and generated inputs share one compression history and the file format cannot become a shortcut \cite{grommelt}. The frozen CLIP ViT-L/14 encoder $f$ maps a patch $x_i$ to a normalised feature $z_i=f(x_i)/\lVert f(x_i)\rVert$, and a linear head scores it: $s_i=\mathbf{w}^{\mathsf T}z_i+b$. Fig.~\ref{fig:pipe} shows the steps.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_image_pipeline}
+  \caption{Processing steps of the image analyser.}\label{fig:pipe}
+\end{figure}
+
+\subsection{Mathematical Model}
+Let $z_1,\dots,z_{10}$ be the normalised features of the ten patches of one image.
+\begin{align}
+  s_i &= \mathbf{w}^{\mathsf T} z_i + b, & s &= \frac{1}{10}\sum_{i=1}^{10} s_i, \\
+  p &= \sigma(a\,s + c) = \frac{1}{1+e^{-(a s + c)}}, & T &= \mathrm{round}\bigl(100\,(1-p)\bigr).
+\end{align}
+Only $\mathbf{w}$ and $b$ are trained, by L2-regularised logistic regression with class weights; the penalty strength $C$ is chosen on a validation split. The Platt parameters $a$ and $c$ are fitted on validation data, so that $p$ behaves like a probability. The verdict limits are chosen on validation data, too: at most 3\% of real validation images may be called AI-generated and at most 10\% of AI images may be called authentic. For the image analyser they are $T\ge 54$ (Likely Authentic) and $T\le 17$ (Likely AI-generated / Manipulated); the values in between mean \emph{Needs Human Review}.
+
+\section{Designs of the Video and Document Analysers}
+\textbf{Video analyser (designed).} About one frame per second is sampled (at most 32 frames). MTCNN \cite{mtcnn} finds and aligns faces, and every crop keeps a margin so that the boundary of the face stays visible \cite{li}. Each crop is scored, first by the image analyser unchanged and then by a head trained on FaceForensics++ \cite{rossler}. The frame scores are averaged over the top-scoring share of frames, so that a short manipulated segment is not diluted by clean frames; they also give a timeline. Splits are made by video, never by frame, and transfer is tested on Celeb-DF \cite{celebdf}.
+
+\textbf{Document analyser (designed).} Pages are rendered and read by OCR \cite{tesseract}. Error-level analysis \cite{krawetz}, spatial-rich-model residuals \cite{fridrich} and DCT features are stacked as a second input stream next to the RGB page of a dual-stream U-Net \cite{unet,zhou} with an EfficientNet encoder \cite{effnet}. It is trained with binary cross-entropy plus a Dice term \cite{vnet} on synthetic forgeries (text replacement, copy-move, splicing) with exact masks and scanner-like noise, and tested on human-made forgeries and DocTamper \cite{doctamper}. Rule checks (line items against the total, dates, font heights, PDF modification history) add flags that are auxiliary evidence and never proof.
+
+\section{Data Flow Diagrams}
+Fig.~\ref{fig:dfd0} shows the context diagram (level 0) and Fig.~\ref{fig:dfd1} the first level.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_dfd0}
+  \caption{Data flow diagram, level 0.}\label{fig:dfd0}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_dfd1}
+  \caption{Data flow diagram, level 1.}\label{fig:dfd1}
+\end{figure}
+
+\section{Use-Case Diagram}
+The user uploads a file and receives the score, the evidence and the report; the project team trains and updates the models and the calibration (Fig.~\ref{fig:uc}).
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_usecase}
+  \caption{Use-case diagram.}\label{fig:uc}
+\end{figure}
+
+\section{Screening Procedure}
+The screening procedure is shown as a flow chart in Fig.~\ref{fig:flow} and as steps below.
+
+\begin{enumerate}
+  \item \textbf{validate}(file): read the type from the bytes, check the size, decode; reject the file if it is corrupt.
+  \item \textbf{route}(type): choose the image, video or document analyser.
+  \item \textbf{analyse}(file): the analyser returns an evidence record (score, visual, cues, flags).
+  \item Calibrate the score into $p$ and compute $T=\mathrm{round}(100(1-p))$.
+  \item Assign the verdict from the band of $T$.
+  \item Build the explanation from the evidence and show the metadata separately.
+\end{enumerate}
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_flow}
+  \caption{Flow chart of the screening procedure.}\label{fig:flow}
+\end{figure}
+
+\section{Additional Checks in the Application}
+Three checks sit beside the model and never change the probability it computes.
+\begin{itemize}
+  \item \textbf{Provenance markers.} Camera data (EXIF) and C2PA credentials \cite{c2pa} are displayed, but they are not scored, because they are easy to remove or forge.
+  \item \textbf{Visible Gemini watermark.} Gemini's own image downloads carry a small four-point star near the bottom-right corner. The application matches the corner of the image against a template of this star; when it is found, the alert states that the image was made or edited with Gemini tools, and the verdict is set to AI-generated. The mark can be cropped away, so its absence proves nothing, and it is reported separately from the model's accuracy.
+  \item \textbf{Notices for unusual files.} Drawings, plain graphics and screenshots, very small images and files that look like copies re-saved by a messaging app are outside what the detector was built for. The application shows a notice for them; for drawings and graphics it also sets the verdict to \emph{Needs Human Review}.
+\end{itemize}
+
+\section{User Interface Design}
+The interface is a single web page with drag-and-drop upload. The result card shows the Trust Score in large type with a colour for the verdict (green, amber or red), then the explanation (``Why?''), and below it tabs for the heatmap, the frequency spectrum, error-level analysis, file metadata and technical details. Two further pages show the cross-generator results and describe how the system works. Screenshots are given in Chapter~5.

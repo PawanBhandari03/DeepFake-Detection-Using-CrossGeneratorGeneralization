@@ -1,0 +1,69 @@
+\chapter{Project Plan}
+
+\section{Development Model}
+We follow an iterative and incremental model. The system is built in three phases, one medium at a time, and every phase ends with a working demonstration that is shown to the guide. The scoring layer, the explanation layer and the web interface built in Phase 1 are reused in Phases 2 and 3, because all analysers return the same evidence record.
+
+\section{Phases}
+\begin{table}[htbp]
+\centering\small
+\caption{The three phases of the project.}
+\begin{tabularx}{\linewidth}{@{}p{1.9cm} p{1.2cm} p{3.0cm} X@{}}
+\toprule
+Phase & Weeks & Dates & Goal and result\\
+\midrule
+1: Image & 1--11 & 28 Sep -- 13 Dec 2026 & Detect fully AI-generated images, including from unseen generators; demo: upload an image and receive Trust Score and heatmap. \textbf{Status: complete.}\\
+2: Video & 12--16 & 14 Dec 2026 -- 17 Jan 2027 & Detect face-manipulated videos; demo: upload a video and receive a score with a timeline of suspicious frames. \textbf{Status: designed.}\\
+3: Document & 17--26 & 18 Jan -- 28 Mar 2027 & Find tampered regions in documents; the full application (image, video, document) and the final report. \textbf{Status: designed.}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Schedule}
+Fig.~\ref{fig:gantt} shows the 26-week plan. Green bars are finished work; blue bars are planned.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_gantt}
+  \caption{Project schedule of 26 weeks in three phases.}\label{fig:gantt}
+\end{figure}
+
+\section{Team Structure}
+The team has three students under the guidance of the project guide. Three roles are needed in every phase and they rotate between the phases, so that every member can explain every part of the project.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Roles in the team.}
+\begin{tabularx}{\linewidth}{@{}p{4.0cm}X@{}}
+\toprule
+Role & Work\\
+\midrule
+Model lead & Trains models and runs experiments\\
+Data and evaluation lead & Datasets, train/test splits, evaluation scripts and results tables\\
+App and report lead & Web application, Trust Score and explanations, weekly report\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Progress is recorded every week in a project roadmap and a work log that are kept in the repository, and the work is reported to the guide at the project reviews.
+
+\section{Risk Management}
+\begin{table}[htbp]
+\centering\small
+\caption{Main risks and how they are handled.}
+\begin{tabularx}{\linewidth}{@{}p{3.6cm} X X@{}}
+\toprule
+Risk & Effect & Mitigation\\
+\midrule
+Dataset access takes weeks (FaceForensics++, Celeb-DF, DocTamper) & Later phases are delayed & Send all access requests in the first week; the image phase uses open data\\
+New generators appear & Accuracy may fall & Test on unseen generators; keep the cheap stored-feature workflow so that a head can be refitted in minutes\\
+Compression and resizing & Evidence is lost in shared files & Train on damaged copies; warn the user about recompressed files\\
+Dataset shortcuts such as file format & Results look better than they are & Re-save every patch in the same way; report unseen-source tests only\\
+Memory limit of free hosting & The app cannot run online & Load only the image half of CLIP; CPU inference; small head\\
+Wrong verdict on a real photograph & Harm to its author & Human-review band; calibrated score; clear wording that the score is not proof\\
+Time & Phases not finished & Phases are independent; each ends with a demo\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Feasibility}
+\textbf{Technical.} The image analyser already runs on a CPU with about 1.5~GB of memory, and training needs only a free cloud GPU for a few hours. \textbf{Economic.} Only free and open-source tools, free hosting and public datasets are used, so the cost is zero. \textbf{Operational.} The web interface needs no installation, and the explanations are written for non-specialists.

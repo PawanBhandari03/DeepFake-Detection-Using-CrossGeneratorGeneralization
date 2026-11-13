@@ -1,0 +1,14 @@
+\chapter{Conclusion and Future Scope}
+
+\section{Conclusion}
+Requirements taken from a specification led to a layered design with independent analysers, a shared evidence interface and a calibrated, explainable scoring layer. The first phase shows that a frozen CLIP encoder with a small head, trained on degraded copies of real and AI-generated images and scored over patches at native resolution, detects most AI images from generators it has never seen: the AUC is 0.982 on 20 unseen generators, against 0.831 for an EfficientNet baseline. The ``proof'' variant, which never saw an OpenAI or Google image, still catches 84\% of ChatGPT images. Tests on full-size photographs taken by the team and their edits show that the same model ranks edits above their originals, and the application adds a human-review band, a check for the visible Gemini watermark and notices for files that are outside the detector's scope. The video and document analysers are fully specified for the next two phases.
+
+\section{Future Scope}
+\begin{itemize}
+  \item \textbf{Phase 2 (video).} Build the video analyser with MTCNN face crops and a head trained on FaceForensics++, and test its transfer to Celeb-DF.
+  \item \textbf{Phase 3 (document).} Build the dual-stream U-Net with OCR, error-level, noise and DCT streams, and the rule checks, and test them on human-made forgeries and DocTamper.
+  \item \textbf{Edited regions.} Replace the coarse $3\times3$ heatmap by a pixel-level map, so that a small machine-made region in a real photograph is found and shown.
+  \item \textbf{Robustness.} Improve results on heavily compressed or resized files, and keep adding the newest generators to the unseen-source tests.
+  \item \textbf{Front end and API.} Offer a separate front end that calls the analysers through a small web API, while keeping the present application as a fallback.
+  \item \textbf{Report.} Complete the downloadable report of every analysis.
+\end{itemize}

@@ -1,0 +1,21 @@
+% Image analyser pipeline (two rows)
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+\node[box,text width=3.0cm] (b1) at (0,0) {\textbf{1.} Input image\\(not resized)};
+\node[box,text width=3.0cm] (b2) at (4.0,0) {\textbf{2.} Ten patches\\224$\times$224: centre\\+ 3$\times$3 grid};
+\node[box,text width=3.0cm] (b3) at (8.0,0) {\textbf{3.} Re-save each patch\\as JPEG, quality 95};
+\node[box,text width=3.0cm] (b4) at (12.0,0) {\textbf{4.} Frozen CLIP\\ViT-L/14 encoder,\\$z=f(x)/\lVert f(x)\rVert$};
+\draw[arr] (b1) -- (b2);
+\draw[arr] (b2) -- (b3);
+\draw[arr] (b3) -- (b4);
+\node[boxg,text width=3.0cm] (b5) at (0,-3.0) {\textbf{5.} Linear head\\$s=\mathbf{w}^{\mathsf T}z+b$\\per patch};
+\node[boxg,text width=3.0cm] (b6) at (4.0,-3.0) {\textbf{6.} Image score\\= mean of the ten\\patch scores};
+\node[boxg,text width=3.0cm] (b7) at (8.0,-3.0) {\textbf{7.} Platt scaling\\$p=\sigma(a\,s+c)$};
+\node[boxo,text width=3.0cm] (b8) at (12.0,-3.0) {\textbf{8.} Trust Score\\$T=\mathrm{round}(100(1-p))$\\and verdict band};
+\draw[arr] (b4.south) -- ++(0,-0.75) -| (b5.north);
+\draw[arr] (b5) -- (b6);
+\draw[arr] (b6) -- (b7);
+\draw[arr] (b7) -- (b8);
+\node[font=\footnotesize,text width=3.0cm,align=center] at (4.0,-4.6) {patch scores also form the $3\times3$ heatmap};
+\draw[darr] (4.0,-4.25) -- (4.0,-3.55);
+\end{tikzpicture}}

@@ -1,0 +1,11 @@
+% ROC-AUC on 20 unseen generators (Table of results); values from paper/analysis.json
+\begin{tikzpicture}
+\begin{axis}[xbar,width=12.5cm,height=6.2cm,xmin=0.90,xmax=1.0,
+  symbolic y coords={All,ChatGPT,Gemini,ProofC,ProofG},ytick=data,y dir=reverse,
+  yticklabels={All 20 unseen generators,ChatGPT (GPT-Image-1.5),Gemini (Nano Banana Pro),Proof model: ChatGPT,Proof model: Gemini},
+  xlabel={ROC-AUC},bar width=11pt,nodes near coords,nodes near coords align={horizontal},
+  every node near coord/.append style={font=\footnotesize},xmajorgrids=true,
+  tick label style={font=\small},label style={font=\small}]
+\addplot[fill=cBlue,draw=cLine] coordinates {(0.982,All) (0.972,ChatGPT) (0.985,Gemini) (0.957,ProofC) (0.984,ProofG)};
+\end{axis}
+\end{tikzpicture}

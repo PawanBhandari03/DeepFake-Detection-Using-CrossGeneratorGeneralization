@@ -1,0 +1,9 @@
+% Baseline comparison on the same test split (values from prototype/results/effnet_comparison.json)
+\begin{tikzpicture}
+\begin{axis}[ybar,width=9cm,height=6cm,ymin=0.5,ymax=1.0,bar width=26pt,
+  symbolic x coords={EffNet,Ours},xtick=data,xticklabels={EfficientNet-B0 baseline,CLIP + trained head (ours)},
+  ylabel={ROC-AUC (clean test files)},nodes near coords,every node near coord/.append style={font=\footnotesize},
+  ymajorgrids=true,tick label style={font=\small},label style={font=\small},enlarge x limits=0.5]
+\addplot[fill=cOrange,draw=cLine] coordinates {(EffNet,0.831) (Ours,0.982)};
+\end{axis}
+\end{tikzpicture}

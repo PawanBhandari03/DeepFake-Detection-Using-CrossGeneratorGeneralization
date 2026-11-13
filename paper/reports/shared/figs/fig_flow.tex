@@ -1,0 +1,29 @@
+% Flow chart of the screening procedure
+\resizebox{!}{0.66\textheight}{%
+\begin{tikzpicture}[node distance=0.9cm]
+\node[box,rounded corners=9pt,fill=cGrey,text width=3cm] (s) at (0,0) {Start: user uploads a file};
+\node[box,text width=3.4cm] (v) at (0,-1.9) {Read file type from the bytes, check size, decode};
+\node[diamond,draw=cLine,thick,fill=cOrange,aspect=2.2,align=center,inner sep=1pt,font=\small] (ok) at (0,-4.3) {Valid file?};
+\node[box,text width=3.0cm] (err) at (5.2,-4.3) {Show a clear error message};
+\node[box,text width=3.4cm] (r) at (0,-6.7) {Route to the image, video or document analyser};
+\node[boxg,text width=3.4cm] (a) at (0,-8.6) {Analyser returns an evidence record (score, visual, cues, flags)};
+\node[box,text width=3.4cm] (c) at (0,-10.5) {Calibrate the score and compute $T=\mathrm{round}(100(1-p))$};
+\node[diamond,draw=cLine,thick,fill=cOrange,aspect=2.4,align=center,inner sep=1pt,font=\small] (b) at (0,-12.9) {Band of $T$};
+\node[boxg,text width=2.6cm] (l1) at (-4.6,-15.0) {Likely Authentic};
+\node[box,text width=2.6cm] (l2) at (0,-15.0) {Needs Human Review};
+\node[boxo,text width=2.6cm] (l3) at (4.6,-15.0) {Likely AI-generated / Manipulated};
+\node[box,rounded corners=9pt,fill=cGrey,text width=4.6cm] (e) at (0,-17.0) {Explanation, metadata (shown apart from the score), downloadable report};
+\draw[arr] (s) -- (v);
+\draw[arr] (v) -- (ok);
+\draw[arr] (ok) -- node[right,font=\scriptsize] {yes} (r);
+\draw[arr] (ok) -- node[above,font=\scriptsize] {no} (err);
+\draw[arr] (r) -- (a);
+\draw[arr] (a) -- (c);
+\draw[arr] (c) -- (b);
+\draw[arr] (b.south west) -- ++(0,-0.4) -| (l1.north);
+\draw[arr] (b.south) -- (l2.north);
+\draw[arr] (b.south east) -- ++(0,-0.4) -| (l3.north);
+\draw[arr] (l1.south) -- ++(0,-0.35) -| (e.north west);
+\draw[arr] (l2.south) -- (e.north);
+\draw[arr] (l3.south) -- ++(0,-0.35) -| (e.north east);
+\end{tikzpicture}}

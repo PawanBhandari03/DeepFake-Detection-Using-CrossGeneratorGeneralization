@@ -1,0 +1,29 @@
+% Training (offline) and inference (online) workflow
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (7.2,1.0) {Offline: free cloud GPU and laptop};
+\node[box,text width=2.9cm] (a1) at (0,0) {Public datasets\\(OpenFake, DiffSeg30k)};
+\node[box,text width=2.9cm] (a2) at (3.7,0) {Patches at native size + degraded copies};
+\node[box,text width=2.9cm] (a3) at (7.4,0) {Frozen CLIP features, stored once};
+\node[box,text width=2.9cm] (a4) at (11.1,0) {Fit small head, choose $C$ on validation};
+\node[box,text width=2.9cm] (a5) at (14.8,0) {Platt scaling and verdict limits on validation};
+\draw[arr] (a1) -- (a2);
+\draw[arr] (a2) -- (a3);
+\draw[arr] (a3) -- (a4);
+\draw[arr] (a4) -- (a5);
+\node[boxw,text width=3.6cm] (t) at (14.8,-2.2) {Held-out test split scored once};
+\draw[arr] (a5) -- (t);
+\node[store,text width=3.6cm] (w) at (9.2,-2.2) {Weight files\\(a few kilobytes)};
+\draw[arr] (t) -- (w);
+\node[font=\small\bfseries] at (7.2,-3.6) {Online: CPU only};
+\node[boxg,text width=2.9cm] (b1) at (0,-5.0) {Upload and validate};
+\node[boxg,text width=2.9cm] (b2) at (3.7,-5.0) {Ten patches, JPEG q95};
+\node[boxg,text width=2.9cm] (b3) at (7.4,-5.0) {CLIP encoder + loaded head};
+\node[boxg,text width=2.9cm] (b4) at (11.1,-5.0) {Calibrated Trust Score};
+\node[boxo,text width=2.9cm] (b5) at (14.8,-5.0) {Verdict, heatmap, explanation};
+\draw[arr] (b1) -- (b2);
+\draw[arr] (b2) -- (b3);
+\draw[arr] (b3) -- (b4);
+\draw[arr] (b4) -- (b5);
+\draw[darr] (w.south) -- ++(0,-1.3) -| (b3.north);
+\end{tikzpicture}}

@@ -1,0 +1,16 @@
+% Existing approach: a detector trained on one source and the problems that follow
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+\node[box,text width=3.0cm] (d) at (0,0) {Real photographs and images from \emph{one} generator};
+\node[box,text width=3.0cm] (m) at (4.4,0) {CNN or frequency-based classifier trained end to end};
+\node[box,text width=3.0cm] (t1) at (8.8,1.5) {Test on the same generator};
+\node[box,text width=3.0cm] (t2) at (8.8,-1.5) {Test on a new generator or a compressed file};
+\node[boxg,text width=3.0cm] (r1) at (13.2,1.5) {High accuracy};
+\node[boxo,text width=3.0cm] (r2) at (13.2,-1.5) {Accuracy can fall close to chance};
+\draw[arr] (d) -- (m);
+\draw[arr] (m.east) -- ++(0.7,0) |- (t1.west);
+\draw[arr] (m.east) -- ++(0.7,0) |- (t2.west);
+\draw[arr] (t1) -- (r1);
+\draw[arr] (t2) -- (r2);
+\node[font=\footnotesize,text width=5.4cm,align=center] at (4.4,-2.6) {Further weaknesses: dataset shortcuts such as file format, no calibrated confidence, no explanation};
+\end{tikzpicture}}

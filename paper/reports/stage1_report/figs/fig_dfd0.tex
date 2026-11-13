@@ -1,0 +1,15 @@
+% Data flow diagram, level 0 (context diagram)
+\resizebox{0.95\linewidth}{!}{%
+\begin{tikzpicture}
+\node[proc,minimum size=3.4cm,text width=2.8cm] (sys) at (0,0) {\textbf{0}\\Unified content authenticity verification system};
+\node[actor,text width=2.4cm] (user) at (-6.2,0) {User\\(student, journalist, analyst)};
+\node[actor,text width=2.4cm] (admin) at (6.2,0) {Project team\\(administrator)};
+\node[store,text width=3.0cm] (data) at (0,-3.6) {Public datasets and\\pretrained CLIP weights};
+\draw[arr] (user.east) ++(0,0.35) -- node[above,font=\scriptsize,sloped,pos=0.5] {file} ($(sys.west)+(0,0.35)$);
+\draw[arr] ($(sys.west)+(0,-0.35)$) -- node[below,font=\scriptsize,pos=0.5] {score, verdict,} ($(user.east)+(0,-0.35)$);
+\node[font=\scriptsize] at (-3.35,-0.95) {heatmap, text};
+\draw[arr] (admin.west) ++(0,0.35) -- node[above,font=\scriptsize] {trained heads,} ($(sys.east)+(0,0.35)$);
+\node[font=\scriptsize] at (3.35,1.05) {calibration};
+\draw[arr] ($(sys.east)+(0,-0.35)$) -- node[below,font=\scriptsize] {evaluation results} ($(admin.west)+(0,-0.35)$);
+\draw[arr] (data) -- node[right,font=\scriptsize] {training inputs} (sys.south);
+\end{tikzpicture}}

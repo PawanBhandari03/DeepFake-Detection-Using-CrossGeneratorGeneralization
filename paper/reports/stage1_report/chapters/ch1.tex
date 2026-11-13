@@ -1,0 +1,55 @@
+\chapter{Introduction}
+
+\section{Introduction to the Project}
+Tools that create pictures from a text description have become part of everyday life. Models such as Stable Diffusion, Midjourney, FLUX and the image generators inside ChatGPT and Gemini produce pictures that most people cannot tell apart from photographs \cite{rombach}. In parallel, face-swapped video is common \cite{rossler}, and a number on an invoice or an identity document can be changed in minutes with ordinary editing software.
+
+A person who receives such a file usually has only two choices: trust it or look at it closely. Looking closely does not work well, and the automatic detectors that exist are usually built for one medium and tuned to the tools they were trained on. This project builds a single web-based screening system. The user uploads an \emph{image}, a \emph{video} or a \emph{document}; the system sends it to a specialised analyser and returns
+
+\begin{itemize}
+  \item a \textbf{Trust Score} from 0 to 100, where 100 means that the file looks authentic;
+  \item a \textbf{verdict}: Likely Authentic, Needs Human Review, or Likely AI-generated / Manipulated;
+  \item \textbf{evidence}: a heatmap of suspicious regions and a short explanation in plain language.
+\end{itemize}
+
+The central research idea is \emph{cross-generator generalization}: the detector has to work on pictures made by tools that were never seen during training, such as a new version of the ChatGPT or Gemini image model. Every accuracy figure in this report therefore comes from tests on sources that were kept out of training.
+
+The project is built in three phases, each ending with a working demonstration: Phase 1 (image), Phase 2 (video) and Phase 3 (document). This report describes the requirements and the design of the whole system and the results of the first phase.
+
+\section{Motivation Behind the Project}
+\begin{itemize}
+  \item \textbf{Real harm.} Fake pictures are used to spread false news, forged documents are used in loan and insurance fraud, and fabricated images of real people are used to harass them.
+  \item \textbf{Detectors age quickly.} A detector trained on one generator can fall close to chance on the next one \cite{ojha,wang}. New image models appear every few months, so a detector must be tested on generators it has not seen.
+  \item \textbf{Benchmarks are not tools.} Collections such as ForensicHub \cite{forensichub} bring many methods together for researchers, but a student, a journalist or a bank clerk cannot use a benchmark.
+  \item \textbf{Mistakes are costly.} A real photograph that is labelled as AI-generated can damage its author. A useful tool therefore has to show its uncertainty and send unclear cases to a person.
+  \item \textbf{Access.} The tool should run on an ordinary CPU and on free hosting, so that anyone can use it.
+\end{itemize}
+
+\section{Aim and Objectives}
+\textbf{Aim.} To design and build an explainable web system that checks whether an image, a video or a document is authentic, AI-generated or tampered with, and that keeps working on generators that were not seen in training.
+
+\textbf{Objectives}
+\begin{enumerate}
+  \item To detect AI-generated images, including those from unseen generators, with an AUC of at least 0.80 and better than an EfficientNet baseline \cite{effnet}.
+  \item To detect face-manipulated videos, and to locate tampered regions in documents (Phases 2 and 3).
+  \item To convert the evidence of every analyser into one calibrated Trust Score with a calibration error of at most 0.05 and a human-review band.
+  \item To explain every verdict with a visual and with sentences that are built only from measured evidence.
+  \item To run on a CPU within the 2.7~GB memory limit of free hosting, without storing uploaded files.
+\end{enumerate}
+
+\section{Scope}
+\textbf{In scope:} still images; short videos with faces; scanned or photographed documents and PDFs; a calibrated Trust Score; explanations; a web interface.\\
+\textbf{Out of scope:} audio deepfakes, real-time streaming, legal-grade certification of evidence, and training of large language models.
+
+\section{Overview of Synthetic Media and Forensics}
+\textbf{Image generators.} Early generators were generative adversarial networks (GANs); today most images come from diffusion models, which start from noise and remove it step by step under the guidance of a text prompt \cite{rombach}. Each generator leaves faint traces: patterns in the fine noise, in the frequency content and in the way textures are built.
+
+\textbf{Edited images.} A growing number of fakes are not generated from scratch but are real photographs that were edited by an AI tool (an object added, a background changed). Only part of the picture is machine-made, which makes detection harder \cite{diffseg}.
+
+\textbf{Face videos.} Face-swap and face-reenactment methods replace a face in each frame. Typical traces are blending boundaries and warping artefacts \cite{li}.
+
+\textbf{Document forgery.} A document can be tampered with by replacing text, copying a region from one place to another (copy-move) or pasting a region from another document (splicing). Classical cues are error levels after JPEG re-saving \cite{krawetz} and noise residuals \cite{fridrich}.
+
+\textbf{Why detection is hard.} Detectors tend to learn the habits of the generators in their training set; datasets can leak labels through the file format \cite{grommelt}; and resizing or compression, which happens every time a picture is shared, removes much of the evidence \cite{corvi}.
+
+\section{Organisation of the Report}
+Chapter 2 surveys the literature. Chapter 3 gives the software requirements. Chapter 4 presents the system design, with diagrams and the mathematical model. Chapter 5 describes the implementation of the first phase and its results. Chapter 6 gives the project plan, the team structure and the risks. Chapter 7 concludes and lists future work. The references and an appendix follow.

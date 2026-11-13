@@ -1,0 +1,52 @@
+% Project Abstract (one page). Compile with pdfLaTeX. Edit names and PRNs in team.tex.
+\documentclass[12pt,a4paper]{article}
+\input{team}
+\input{preamble}
+\begin{document}
+\thispagestyle{empty}
+\onehalfspacing
+
+\begin{center}
+  {\bfseries JSPM'S}\\[3pt]
+  {\bfseries BHIVARABAI SAWANT INSTITUTE OF TECHNOLOGY AND RESEARCH, WAGHOLI, PUNE.}\\[3pt]
+  {\bfseries DEPARTMENT OF COMPUTER ENGINEERING}
+\end{center}
+
+\vspace{4pt}
+\begin{tabular}{@{}l l@{}}
+  Name of Team Members : & \StudentOneName.\\
+                         & \StudentTwoName.\\
+                         & \StudentThreeName.\\[3pt]
+  Name of Guide : & \GuideName\\
+  Academic Year : & \AcademicYear
+\end{tabular}
+
+\vspace{4pt}
+\noindent\textbf{Project Title :} \textbf{\MakeUppercase{\ProjectTitle}: \MakeUppercase{\ProjectSubtitle}}
+
+\vspace{2pt}
+\noindent\rule{\linewidth}{0.8pt}
+
+\vspace{2pt}
+\noindent\textbf{Abstract:}
+
+\begingroup
+\setstretch{1.25}
+\small
+Realistic AI-generated images, face-swapped videos and edited documents are easy to produce today, yet the person who receives such a file needs one answer that can be understood and checked. This project builds a web-based system that accepts an image, a video or a document, passes it to a specialised analyser and turns the evidence into a calibrated Trust Score from 0 to 100, a verdict (Likely Authentic, Needs Human Review or Likely AI-generated / Manipulated), a heatmap and a plain-language explanation. The work is carried out in three phases: image, video and document.
+
+The image analyser, completed in the first phase, cuts ten $224\times224$ patches at native resolution, encodes them with a frozen CLIP ViT-L/14 model and scores them with a small logistic head trained on degraded copies of real and AI-generated images, so that it also works on files that were resized or compressed. On 20 generators that were not seen in training it reaches an AUC of 0.982, against 0.831 for an EfficientNet-B0 baseline trained on the same images, and it accepts 92\% of real photographs. A variant that never saw an OpenAI or Google image still catches 84\% of ChatGPT images. On photographs taken by the team and their ChatGPT and Gemini edits, the analyser ranks the edit above the original with an AUC of 0.95 (10 ChatGPT pairs) and 0.92 (47 Gemini pairs). The application also looks for the visible Gemini watermark and warns when a file is a drawing, a screenshot or a heavily compressed copy. The video and document analysers are designed and will be built in the next phases.
+
+\medskip
+\noindent\textbf{Keywords:} deepfake detection, AI-generated images, cross-generator generalization, CLIP, calibration, explainable verification.
+\endgroup
+
+\vfill
+\noindent
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}ccc}
+  \SignBlock{\GuideName}{Name of Guide} &
+  \SignBlock{\HODName}{HOD, COMP. Dept.} &
+  \SignBlock{\PrincipalName}{Principal, BSIOTR}
+\end{tabular*}
+\vspace{4pt}
+\end{document}

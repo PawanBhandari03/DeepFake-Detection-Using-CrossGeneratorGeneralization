@@ -1,0 +1,27 @@
+% Layered architecture: solid = implemented, dashed = designed
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+\node[box,text width=3.8cm] (up) at (1.9,0) {User upload\\image, video or document};
+\node[box,text width=5.4cm] (val) at (7.6,0) {Validation and routing\\file type read from the bytes,\\size limit, safe decoding};
+\draw[arr] (up) -- (val);
+% bus to the three analysers
+\draw[thick,cLine] (val.south) -- (7.6,-1.25);
+\draw[thick,cLine] (1.9,-1.25) -- (13.3,-1.25);
+\node[boxg,text width=4.1cm] (img) at (1.9,-3.0) {\textbf{Image analyser}\\(implemented)\\native-resolution patches,\\frozen CLIP + trained head,\\patch heatmap};
+\node[designed,text width=4.1cm] (vid) at (7.6,-3.0) {\textbf{Video analyser}\\(designed)\\sampled frames, face crops,\\frame scores, timeline};
+\node[designed,text width=4.1cm] (doc) at (13.3,-3.0) {\textbf{Document analyser}\\(designed)\\OCR, ELA / SRM / DCT views,\\dual-stream U-Net mask,\\rule checks};
+\draw[arr] (1.9,-1.25) -- (img.north);
+\draw[arr] (7.6,-1.25) -- (vid.north);
+\draw[arr] (13.3,-1.25) -- (doc.north);
+% evidence bus
+\draw[thick,cLine] (img.south) -- (1.9,-5.0);
+\draw[thick,cLine] (vid.south) -- (7.6,-5.0);
+\draw[thick,cLine] (doc.south) -- (13.3,-5.0);
+\draw[thick,cLine] (1.9,-5.0) -- (13.3,-5.0);
+\node[box,text width=6.4cm] (ev) at (7.6,-6.1) {Evidence records\\score, map or timeline, numeric cues, flags};
+\draw[arr] (7.6,-5.0) -- (ev.north);
+\node[box,text width=6.4cm] (cal) at (7.6,-7.7) {Calibration and fusion\\$p=\sigma(a\,s+c)$ (Platt scaling)};
+\draw[arr] (ev) -- (cal);
+\node[boxo,text width=8.0cm] (out) at (7.6,-9.3) {Trust Score 0--100, verdict band,\\explanation sentences, downloadable report};
+\draw[arr] (cal) -- (out);
+\end{tikzpicture}}

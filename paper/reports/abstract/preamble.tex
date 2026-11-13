@@ -1,0 +1,114 @@
+% ============================================================================
+% Shared preamble for the three project reports (Abstract, Synopsis, Stage 1).
+% Every main.tex starts with \documentclass and then \input{preamble}.
+% Only standard packages that are on Overleaf by default are used.
+% ============================================================================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}                       % Times-style text and maths
+\usepackage[a4paper,left=3cm,right=2.5cm,top=2.5cm,bottom=2.6cm]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{booktabs,array,tabularx,multirow,longtable}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.misc,calc,fit,backgrounds,decorations.pathreplacing}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usepackage{pgfgantt}
+
+% ---- colours (also readable in black and white) ----------------------------
+\definecolor{cBlue}{HTML}{DCE8F5}
+\definecolor{cGreen}{HTML}{DDEEDD}
+\definecolor{cOrange}{HTML}{FBE5CC}
+\definecolor{cGrey}{HTML}{EEEEEE}
+\definecolor{cLine}{HTML}{333333}
+
+% ---- page style: footer as in the department's report format -----------------
+\newcommand{\FooterText}{BSIOTR, Department of Computer Engineering, \AcademicYearShort}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\small \FooterText\\[2pt]\thepage}
+\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}\fancyfoot[C]{\small \FooterText\\[2pt]\thepage}}
+
+% ---- headings ------------------------------------------------------------------
+\makeatletter
+\@ifundefined{chapter}{}{%
+  \titleformat{\chapter}[display]{\centering\bfseries\Large}{CHAPTER \thechapter}{8pt}{\Large\MakeUppercase}
+  \titlespacing*{\chapter}{0pt}{-10pt}{22pt}}
+\makeatother
+\titleformat{\section}{\bfseries\large}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\bfseries\normalsize}{\thesubsection}{0.6em}{}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\setlist{itemsep=2pt,topsep=3pt}
+\renewcommand{\arraystretch}{1.18}
+\setlength{\emergencystretch}{3em}
+
+% ---- TikZ styles shared by all diagrams ----------------------------------------
+\tikzset{
+  >=Stealth,
+  box/.style={rectangle,rounded corners=2pt,draw=cLine,thick,fill=cBlue,align=center,
+              minimum height=9mm,inner sep=4pt,font=\small},
+  boxg/.style={box,fill=cGreen},
+  boxo/.style={box,fill=cOrange},
+  boxw/.style={box,fill=white},
+  designed/.style={box,fill=white,dashed},
+  store/.style={rectangle,draw=cLine,thick,fill=cGrey,align=center,minimum height=8mm,inner sep=4pt,font=\small},
+  actor/.style={rectangle,draw=cLine,thick,fill=cOrange,align=center,minimum height=8mm,inner sep=4pt,font=\small},
+  usecase/.style={ellipse,draw=cLine,thick,fill=cBlue,align=center,font=\footnotesize,inner sep=2pt,minimum height=8mm},
+  proc/.style={circle,draw=cLine,thick,fill=cBlue,align=center,font=\footnotesize,inner sep=2pt},
+  arr/.style={->,thick,draw=cLine},
+  darr/.style={->,thick,draw=cLine,dashed},
+}
+
+% ---- helper: include a figure file only if it exists (keeps the build alive) ---
+\newcommand{\OptionalGraphic}[2][width=\linewidth]{%
+  \IfFileExists{#2}{\includegraphics[#1]{#2}}{\fbox{\parbox{0.8\linewidth}{\centering\small Image file \texttt{#2} not found}}}}
+
+% ---- signature block used on certificate and abstract pages --------------------
+\newcommand{\SignBlock}[2]{\begin{tabular}[t]{@{}c@{}}\rule{4.2cm}{0.4pt}\\[-1pt]\textbf{#1}\\#2\end{tabular}}
+
+% ---- cover page (the first argument is the report type line) -------------------
+\newcommand{\CoverPage}[1]{%
+  \thispagestyle{empty}
+  \begin{center}
+    {\bfseries #1\par}
+    \vspace{10pt}
+    {\bfseries ``\ProjectTitleCaps''\par}
+    \vspace{14pt}
+    SUBMITTED TO THE SAVITRIBAI PHULE PUNE UNIVERSITY, PUNE\\
+    IN THE PARTIAL FULFILLMENT OF THE REQUIREMENTS\\
+    FOR THE AWARD OF THE DEGREE\\[8pt]
+    OF\\[8pt]
+    {\bfseries BACHELOR OF ENGINEERING (COMPUTER ENGINEERING)}\par
+    \vspace{22pt}
+    {\bfseries SUBMITTED BY}\par
+    \vspace{8pt}
+    \begin{tabular}{@{}ll@{}}
+      \StudentOne & PRN No.: \PRNOne\\
+      \StudentTwo & PRN No.: \PRNTwo\\
+      \StudentThree & PRN No.: \PRNThree
+    \end{tabular}\par
+    \vspace{16pt}
+    \IfFileExists{bsiotr_logo.png}{\includegraphics[height=2.6cm]{bsiotr_logo.png}\par}{}
+    \vspace{10pt}
+    {\bfseries DEPARTMENT OF COMPUTER ENGINEERING}\par
+    \vspace{10pt}
+    {\bfseries JSPM'S, BHIVARABAI SAWANT INSTITUTE OF TECHNOLOGY \& RESEARCH}\par
+    \InstituteAddress\par
+    \vspace{6pt}
+    {\bfseries SAVITRIBAI PHULE PUNE UNIVERSITY}\par
+    \vspace{6pt}
+    {\bfseries \AcademicYear}
+  \end{center}
+  \newpage}

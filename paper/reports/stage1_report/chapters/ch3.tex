@@ -1,0 +1,110 @@
+\chapter{Software Requirements Specification}
+The requirements follow the structure of IEEE Std 830-1998 (continued in ISO/IEC/IEEE 29148). The full specification is kept in the project repository; this chapter gives its main parts.
+
+\section{Product Perspective and Users}
+The system is a new, self-contained product with three analysis pipelines (image, video, document) that share one scoring engine and one web interface. Models are trained offline on free cloud GPUs; the web application only loads the trained files.
+
+\begin{table}[htbp]
+\centering\small
+\caption{User classes.}
+\begin{tabularx}{\linewidth}{@{}p{4.2cm}X@{}}
+\toprule
+User class & Characteristics\\
+\midrule
+General public, students & Not technical; need a simple verdict and an explanation\\
+Journalists, fact-checkers, moderators & Use it often; need speed and clear evidence\\
+Bank, KYC, insurance and legal staff & Check documents and faces; need traceable evidence\\
+Project team (administrators) & Train, evaluate and update the models\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Assumptions and Dependencies}
+\begin{itemize}
+  \item Public datasets remain available. GenImage and OpenFake are public; FaceForensics++, Celeb-DF and DocTamper need access requests.
+  \item The pretrained CLIP weights remain downloadable.
+  \item Uploaded files are not deliberately adversarial beyond normal editing and compression.
+  \item Free hosting (Streamlit Community Cloud) remains available, with a memory limit of about 2.7~GB.
+\end{itemize}
+
+\section{Functional Requirements}
+\begin{table}[htbp]
+\centering\small
+\caption{Functional requirements.}
+\begin{tabularx}{\linewidth}{@{}l X p{3.2cm}@{}}
+\toprule
+ID & Requirement & Input $\rightarrow$ output\\
+\midrule
+FR1 & Validate every upload by its file signature; accept the usual image, video and PDF or scan formats; refuse corrupt or unsupported files with a clear message. & File $\rightarrow$ internal form, or error\\
+FR2 & Estimate the probability that an image is AI-generated with a frozen CLIP encoder and a trained classifier, scoring patches at native resolution. & Image $\rightarrow$ probability, heatmap\\
+FR3 & Sample video frames, find faces, score each frame and merge the scores into one result with a timeline. & Video $\rightarrow$ probability, timeline\\
+FR4 & Locate tampered document regions with OCR, forensic maps (ELA, SRM, DCT) and a dual-stream U-Net, plus logic and PDF-structure checks. & Document $\rightarrow$ mask, flags\\
+FR5 & Compute Trust Score $=100(1-p)$ and a verdict: Authentic, Manipulated, or Needs Human Review. & Evidence $\rightarrow$ score, verdict\\
+FR6 & Show a visual and sentences built only from measured evidence; show file metadata (EXIF, C2PA) apart from the score. & Evidence $\rightarrow$ explanation\\
+FR7 & Let the user view and download a report of the analysis. & Result $\rightarrow$ report\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{External Interface Requirements}
+\begin{itemize}
+  \item \textbf{User interface:} a web page with drag-and-drop upload, a result card with the Trust Score and a colour-coded verdict, a heatmap, an explanation, tabs for technical evidence, and pages for the cross-generator results and a ``How it works'' description.
+  \item \textbf{Hardware interface:} a standard laptop or server CPU for inference; a GPU is optional and is used only for training.
+  \item \textbf{Software interface:} Python, PyTorch, open\_clip, Pillow (with HEIC support), scikit-learn, Streamlit; later OpenCV/FFmpeg, Tesseract and PyMuPDF for video and documents.
+  \item \textbf{Communication interface:} HTTPS between the browser and the server; GitHub for the code, with automatic redeployment when the main branch changes.
+\end{itemize}
+
+\section{Non-functional Requirements}
+\textbf{Performance.} An image should be analysed in about five seconds on a laptop CPU (the first prototype needed about ten); server memory must stay below 2.7~GB (peak use of the prototype is about 1.5~GB).
+
+\textbf{Safety.} Probabilities must be calibrated, uncertain cases go to \emph{Needs Human Review}, and no verdict is shown without evidence. The Trust Score is a screening aid and not a forensic proof.
+
+\textbf{Security and privacy.} Uploads are processed in temporary memory and are never stored or used for training. Files are parsed and never executed, and an image-size limit protects against decompression attacks.
+
+\textbf{Software quality attributes.}
+\begin{itemize}
+  \item \emph{Reliability:} every verdict has evidence; invalid files are rejected with a message.
+  \item \emph{Usability:} colour-coded verdicts, plain-language explanations and the result on one screen.
+  \item \emph{Maintainability:} independent analysers behind one evidence interface, so that a model can be replaced without changing the application.
+  \item \emph{Portability:} runs on Windows and Linux, CPU only.
+\end{itemize}
+
+\section{System Requirements}
+\begin{table}[htbp]
+\centering\small
+\caption{Hardware and software resources.}
+\begin{tabularx}{\linewidth}{@{}p{3.6cm}X@{}}
+\toprule
+Item & Specification\\
+\midrule
+Development machine & Laptop with 8~GB RAM, no GPU\\
+Training & Free Kaggle GPU for feature extraction; the head is fitted on the laptop in minutes\\
+Operating system & Windows 11 (development), Linux (hosting)\\
+Language and libraries & Python 3.11, PyTorch (CPU), open\_clip, scikit-learn, Pillow, NumPy, Matplotlib, Streamlit\\
+Pretrained model & CLIP ViT-L/14 image encoder (OpenAI weights)\\
+Hosting & Streamlit Community Cloud, deployed from GitHub\\
+Data store & Files only: trained head weights (a few kilobytes) and result files; no database, no stored uploads\\
+Browser & Chrome, Edge or Firefox on desktop or mobile\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Constraints}
+Only free and open-source tools are used and the budget is zero. Datasets are used under their research licences. The academic timeline is 26 weeks, from September 2026 to March 2027.
+
+\section{Acceptance Criteria}
+\begin{table}[htbp]
+\centering\small
+\caption{Acceptance targets taken from the specification.}
+\begin{tabularx}{\linewidth}{@{}p{2.6cm}X@{}}
+\toprule
+Area & Target\\
+\midrule
+Image & Seen-generator AUC of at least 0.95; average unseen-generator AUC of at least 0.80 and above the EfficientNet baseline\\
+Video & FaceForensics++ AUC of at least 0.90; Celeb-DF (unseen) AUC of at least 0.75\\
+Document & Pixel F1 of at least 0.70 on the synthetic test; better than an RGB-only baseline on real forgeries\\
+Trust Score & Calibration error of at most 0.05\\
+Functional & All listed formats accepted; invalid files rejected with a message; every result has a score, a verdict and evidence\\
+\bottomrule
+\end{tabularx}
+\end{table}

@@ -1,0 +1,23 @@
+\chapter{Glossary}
+\begin{table}[htbp]
+\centering\small
+\caption{Terms and abbreviations used in this report.}
+\begin{tabularx}{\linewidth}{@{}p{3.6cm}X@{}}
+\toprule
+Term & Meaning\\
+\midrule
+Generator & An AI tool that creates images or videos, for example Stable Diffusion, Midjourney, the ChatGPT image model or the Gemini image model\\
+Cross-generator generalization & Detecting content from generators that were not used in training\\
+CLIP & A pretrained vision-language model from OpenAI; its frozen image encoder provides the features\\
+Frozen encoder & A model whose weights are not changed during our training\\
+Trust Score & $100\times(1-p)$, where $p$ is the calibrated probability of AI generation; 100 means that the file looks authentic\\
+ROC-AUC & Area under the ROC curve; 0.5 means guessing and 1.0 means a perfect ranking of fake above real\\
+Calibration & Making a probability match the real frequency of the event\\
+Platt scaling & Fitting $p=\sigma(a s+c)$ on validation data to calibrate a raw score\\
+Patch & A $224\times224$ pixel square cut from the image\\
+Heatmap & A map that colours each patch by how AI-like it looks\\
+ELA, SRM, DCT & Error-level analysis, spatial rich model noise residuals, discrete cosine transform features\\
+FR / NFR & Functional / non-functional requirement\\
+\bottomrule
+\end{tabularx}
+\end{table}

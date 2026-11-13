@@ -1,0 +1,200 @@
+% Project Synopsis. Compile with pdfLaTeX (run twice so the contents page fills in).
+% Edit names and PRNs in team.tex.
+\documentclass[12pt,a4paper]{article}
+\input{team}
+\input{preamble}
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+\titleformat{\section}{\bfseries\large\MakeUppercase}{\thesection.}{0.6em}{}
+\begin{document}
+
+\CoverPage{A SYNOPSIS REPORT ON}
+
+% ------------------------------------------------------------------- contents
+\thispagestyle{empty}
+\begin{center}{\bfseries\Large\underline{CONTENTS}}\end{center}
+\vspace{6pt}
+\renewcommand{\contentsname}{}
+{\small\tableofcontents}
+\newpage
+\setcounter{page}{1}
+\onehalfspacing
+
+% ---------------------------------------------------------------- 1
+\section{Introduction}
+Images produced by AI tools such as Stable Diffusion, Midjourney, FLUX, the ChatGPT image model and the Gemini image model now look like photographs \cite{rombach}. Face-swapped video is common \cite{rossler}, and a figure on an invoice can be changed in a few minutes. Looking at such a file by eye is no longer a reliable way to judge it.
+
+Research on detection is organised by medium: one line of work studies images, another face videos, another document forgery. The detectors are usually tuned to the generators they were trained on, so a detector trained on one generator can fall close to chance on the next \cite{ojha,wang}. Datasets can leak the answer through the file format \cite{grommelt}, and compression removes much of the evidence \cite{corvi}.
+
+This project builds one web-based system that accepts an image, a video or a document, sends it to a specialised analyser and turns the evidence into a calibrated Trust Score from 0 to 100, a verdict and a plain-language explanation. The work is done in three phases (image, video, document). The image analyser is complete and evaluated; the video and document analysers are designed and will be built next.
+
+% ---------------------------------------------------------------- 2
+\section{Motivation / Need of the Project}
+\begin{itemize}
+  \item \textbf{Harm from fake content.} Synthetic images spread false news, fake documents are used in fraud, and fake pictures of real people are used to harass them.
+  \item \textbf{No tool for ordinary users.} Benchmarks such as ForensicHub \cite{forensichub} bring many detectors together, but a benchmark is not a tool that a student, a journalist or a bank clerk can use.
+  \item \textbf{New generators appear all the time.} A detector is only useful if it keeps working on tools it was not trained on, such as the latest ChatGPT and Gemini image models. This is the main research question of the project.
+  \item \textbf{Uncertainty must be shown.} Calling a real photograph ``AI-generated'' can harm its author, so the system must be able to say ``a person should check this''.
+  \item \textbf{Low cost.} The system must run on a CPU inside the memory limit of free hosting, so that anyone can use it without special hardware.
+\end{itemize}
+
+% ---------------------------------------------------------------- 3
+\section{Problem Definition}
+To design and develop a web-based, explainable system that checks whether an image, a video or a document is authentic, AI-generated or tampered with. The system routes each file to a specialised analyser and reports a calibrated Trust Score, a verdict with a human-review band and the evidence behind it. Detection must hold for generators that were not seen in training.
+
+\textbf{Objectives}
+\begin{itemize}
+  \item To detect AI-generated images, including images from unseen generators, with an unseen-generator AUC of at least 0.80 and better than an EfficientNet baseline \cite{effnet}.
+  \item To detect face-manipulated videos (FaceForensics++ and Celeb-DF) and to locate tampered regions in documents.
+  \item To convert every result into one Trust Score with a calibration error of at most 0.05 and a ``Needs Human Review'' band.
+  \item To explain each verdict with a heatmap and sentences that are built only from measured evidence.
+  \item To keep the system on a CPU with under 2.7 GB of memory, with no uploads stored.
+\end{itemize}
+
+% ---------------------------------------------------------------- 4
+\section{Existing System}
+\subsection{Methodology (Architecture)}
+A typical existing detector is built in three steps: collect real images and fake images from one or a few generators, train a classifier on them, and test it on images made by the same generators. Wang et al. trained a CNN with blur and JPEG augmentation \cite{wang}. Ojha et al. trained a linear classifier on frozen CLIP features and showed that it transfers better to unseen generators \cite{ojha}. Public benchmarks such as GenImage \cite{genimage} and OpenFake \cite{openfake} provide images from many generators. For video, FaceForensics++ \cite{rossler} and Celeb-DF \cite{celebdf} are the standard sets, and for documents DocTamper \cite{doctamper} is used.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_existing}
+  \caption{Typical existing approach: training on one source and the problems that follow.}
+\end{figure}
+
+\subsection{Advantages and Disadvantages}
+\textbf{Advantages}
+\begin{itemize}
+  \item The methods are well studied and public benchmarks exist for images, face video and documents.
+  \item Detectors built on CLIP features generalise better than detectors trained from scratch \cite{ojha}.
+\end{itemize}
+\textbf{Disadvantages}
+\begin{itemize}
+  \item Many detectors are tied to the generators they saw in training and can fall close to chance on new ones.
+  \item Some datasets leak the label through file format \cite{grommelt}, and compression or resizing weakens most detectors \cite{corvi}.
+  \item Each system handles one medium only, and most give a bare label without a calibrated confidence or an explanation.
+\end{itemize}
+
+% ---------------------------------------------------------------- 5
+\section{Proposed System}
+\subsection{Methodology (Architecture)}
+The proposed system has a layered design (Fig.~\ref{fig:arch}). A Streamlit web interface receives the upload; a validation layer reads the true file type from the bytes and decodes the file; a router calls the image, video or document analyser. All analysers return the same kind of evidence record (a score, a visual, numeric cues and flags). A scoring layer calibrates the record and an explanation layer writes the sentences. Because the analysers share only this interface, one of them can be replaced without touching the rest of the application.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_architecture}
+  \caption{Layered architecture. Solid boxes are implemented; dashed boxes are designed.}\label{fig:arch}
+\end{figure}
+
+Training and use are kept apart (Fig.~\ref{fig:train}). The heavy work, such as turning hundreds of thousands of patches into features, runs once on a free cloud GPU. The application loads the frozen encoder and a trained head of a few kilobytes and runs on a CPU.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_training}
+  \caption{Offline training workflow and online use of the trained model.}\label{fig:train}
+\end{figure}
+
+\subsection{Project Modules}
+The basic modules of the project are:
+\begin{enumerate}[label=\arabic*)]
+  \item Input validation and routing
+  \item Image analyser (implemented)
+  \item Video analyser (designed)
+  \item Document analyser (designed)
+  \item Scoring, calibration and explanation
+  \item Web interface and report
+\end{enumerate}
+
+\textbf{1) Input validation and routing.} The file type is read from the bytes and not from the file name; size limits are applied; damaged files are refused with a clear message. Uploads are processed in memory and are not stored.
+
+\textbf{2) Image analyser.} The image is not resized, because resizing removes fine traces. Ten $224\times224$ patches (the centre and a $3\times3$ grid) are cut at native resolution and re-saved as JPEG with quality 95, so that real and generated inputs share one compression history. Each patch is encoded by a frozen CLIP ViT-L/14 model and scored by a linear head; the image score is the mean of the patch scores, and the patch scores form the heatmap (Fig.~\ref{fig:pipe}).
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_image_pipeline}
+  \caption{Processing steps of the image analyser.}\label{fig:pipe}
+\end{figure}
+
+\textbf{3) Video analyser (designed).} About one frame per second is sampled (at most 32). MTCNN \cite{mtcnn} finds and aligns the faces; every face crop is scored, first by the image analyser unchanged and then by a head trained on FaceForensics++. The frame scores are averaged over the top-scoring share of frames, so a short manipulated segment is not hidden by clean frames, and they also give a timeline.
+
+\textbf{4) Document analyser (designed).} Pages are rendered and read by OCR \cite{tesseract}. Error-level analysis \cite{krawetz}, noise residuals from the spatial rich model \cite{fridrich} and DCT features are stacked as a second input stream next to the RGB page of a dual-stream U-Net \cite{unet,zhou}. Rule checks (line items against the total, dates, font heights, PDF history) add flags that are auxiliary evidence, never proof.
+
+\textbf{5) Scoring, calibration and explanation.} A raw score $s$ becomes a probability $p=\sigma(a\,s+c)$ by Platt scaling \cite{platt}, fitted on validation data. The Trust Score is $T=\mathrm{round}\bigl(100(1-p)\bigr)$. Two limits chosen on validation data divide $T$ into \emph{Likely Authentic} ($T\ge 54$), \emph{Needs Human Review} and \emph{Likely AI-generated / Manipulated} ($T\le 17$). The sentences of the explanation come only from measured evidence.
+
+\textbf{6) Web interface and report.} The user uploads a file and sees the Trust Score, the verdict, the heatmap, the explanation, the file metadata (shown apart from the score) and a downloadable report.
+
+\subsection{Algorithms Used}
+\textbf{1) CLIP image encoder (frozen).} The ViT-L/14 image encoder of CLIP \cite{radford} turns a patch into a 768-number feature vector. It is not trained; only the head on top of it is.
+
+\textbf{2) Logistic regression head.} A linear head $s=\mathbf{w}^{\mathsf T}z+b$ on the normalised feature $z=f(x)/\lVert f(x)\rVert$, trained with L2 regularisation on features of real photographs and images from about sixty generators, including edited-image patches \cite{diffseg}. Every training image also gives a randomly resized, blurred and JPEG-compressed copy, an idea taken from blur-and-JPEG augmentation \cite{wang}.
+
+\textbf{3) Patch averaging.} The image score is the mean of the ten patch scores, so that a few unusual patches do not decide the result.
+
+\textbf{4) Platt scaling and verdict limits.} Calibration \cite{guo,platt} makes the probability behave like a real probability; the verdict limits are chosen on validation data so that at most 3\% of real images are called AI-generated and at most 10\% of AI images are called authentic \cite{geifman}.
+
+\textbf{5) Video and document methods (planned).} MTCNN \cite{mtcnn}, top-fraction aggregation, ELA \cite{krawetz}, SRM \cite{fridrich}, dual-stream U-Net \cite{unet} with binary cross-entropy plus a Dice term \cite{vnet}.
+
+\textbf{6) Evaluation.} ROC-AUC \cite{fawcett}, the share of AI images caught, the share of real images accepted, 95\% bootstrap intervals \cite{efron} and the expected calibration error \cite{naeini}.
+
+\subsection{Advantages and Disadvantages}
+\textbf{Advantages}\\
+The image analyser was tested on 20 generators that were not in the training data (1,200 real and 2,192 AI images).
+
+\begin{table}[htbp]
+\centering\small
+\caption{Image analyser on the held-out test split (clean files).}
+\begin{tabular}{lcc}
+\toprule
+Test images & ROC-AUC & AI images caught\\
+\midrule
+All 20 unseen generators & 0.982 & 94\%\\
+ChatGPT (GPT-Image-1.5) & 0.972 & 89\%\\
+Gemini (Nano Banana Pro) & 0.985 & 94\%\\
+Proof model, ChatGPT & 0.957 & 84\%\\
+Proof model, Gemini & 0.984 & 98\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The ``proof model'' was trained without any OpenAI or Google image, so its result is a true unseen-source test. An EfficientNet-B0 baseline trained on the same images reaches an AUC of 0.831 on this test, against 0.982 for the proposed analyser. The model runs on a CPU, gives a calibrated score and an explanation, and keeps uploads private.
+
+\textbf{Disadvantages}
+\begin{itemize}
+  \item The head is linear and the heatmap is coarse ($3\times3$ patches).
+  \item Heavy compression and resizing weaken detection, and a small edited region can be diluted when patch scores are averaged.
+  \item Only the image analyser is built and evaluated so far; the video and document analysers are designed.
+  \item The Trust Score is a screening aid and not forensic proof.
+\end{itemize}
+
+% ---------------------------------------------------------------- 6
+\section{Applications}
+\begin{itemize}
+  \item Fact-checking and newsrooms: screening pictures that arrive from the public.
+  \item Social media and content moderation: flagging likely AI images for a human reviewer.
+  \item Banks, insurers and KYC teams: first-level screening of submitted documents (planned for the document analyser).
+  \item Education and awareness: showing students why a picture looks synthetic, through the heatmap and explanation.
+  \item Personal use: checking a picture received in a messaging group.
+\end{itemize}
+
+% ---------------------------------------------------------------- 7
+\section{Conclusion and Future Scope}
+\textbf{Conclusion.} A frozen CLIP encoder with a small trained head, a degraded-copy training set and a calibrated, explainable scoring layer detects most AI images from unseen generators, and a layered design lets the same Trust Score serve images, videos and documents.
+
+\textbf{Future scope.}
+\begin{itemize}
+  \item Build and evaluate the video analyser (Phase 2) on FaceForensics++ and Celeb-DF.
+  \item Build the document analyser (Phase 3) with a dual-stream U-Net and rule checks, and test it on human-made forgeries and DocTamper.
+  \item Improve robustness to compression and resizing, and finer, pixel-level maps for edited regions.
+  \item Add more recent generators to the unseen-source tests as they appear.
+  \item Offer a separate front end that calls the analysers through an API.
+\end{itemize}
+
+% ---------------------------------------------------------------- 8
+\section{References}
+\begingroup
+\small
+\begin{thebibliography}{99}
+\input{refs}
+\end{thebibliography}
+\endgroup
+
+\end{document}

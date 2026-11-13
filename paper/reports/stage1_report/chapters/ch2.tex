@@ -1,0 +1,42 @@
+\chapter{Literature Survey}
+We first studied the research papers that address the same problem and then followed the topics named in them: image detection, datasets, edited images, face video, document forgery, and calibration. This chapter summarises what we learned and the gap that the project fills.
+
+\section{Detection of AI-Generated Images}
+Wang et al. \cite{wang} showed that a CNN trained on images from one GAN can detect images from other GANs when blur and JPEG compression are used during training, but its accuracy drops for other kinds of generators. Corvi et al. \cite{corvi} studied diffusion-model images and found that detectors weaken after resizing and compression. Ojha et al. \cite{ojha} proposed a simple alternative: extract features with the frozen CLIP encoder \cite{radford} and train only a linear classifier on top. Because the features come from a model trained on a very large set of image-text pairs, this classifier transfers better to generators it has not seen. Our image analyser follows this idea and adds patches at native resolution, degraded training copies and a calibrated score.
+
+\section{Datasets and Benchmarks}
+GenImage \cite{genimage} is a million-scale collection of images from eight generators and defines a cross-generator protocol. OpenFake \cite{openfake} provides real photographs and images from about sixty generators, including recent ones, with test generators that are kept apart from training. Grommelt et al. \cite{grommelt} showed that some datasets can be solved by looking at the file format and compression of the images and not at their content; this is why every patch in our pipeline is re-saved in the same way before it is scored. ForensicHub \cite{forensichub} puts several detection and localisation methods into one benchmark.
+
+\section{Locally Edited Images}
+DiffSeg30k \cite{diffseg} contains photographs that were edited in several turns by diffusion models, with masks that show the edited areas. Such data lets a detector learn what an edited patch looks like. GPT-Image-Edit-1.5M \cite{gptedit} is a large set of source images, instructions and edits produced with a GPT image model; we examined it as a possible source of edit data.
+
+\section{Face Video}
+FaceForensics++ \cite{rossler} and Celeb-DF \cite{celebdf} are the standard training and transfer sets for face manipulation. Faces are located and aligned with MTCNN \cite{mtcnn}. Li and Lyu \cite{li} showed that the warping artefacts left when a face is fitted into the target frame are a useful cue; we therefore keep a margin around every face crop so that the boundary region stays visible.
+
+\section{Document Tampering}
+DocTamper \cite{doctamper} is a large dataset of tampered text images. Zhou et al. \cite{zhou} combine the RGB image with noise features in two streams for manipulation detection. Error-level analysis \cite{krawetz} and the spatial rich model \cite{fridrich} provide classical forensic maps, and U-Net \cite{unet} with a Dice term \cite{vnet} is the usual set-up for segmenting the edited region. Text is read with the Tesseract OCR engine \cite{tesseract}.
+
+\section{Calibration, Uncertainty and Provenance}
+Modern neural networks are often over-confident \cite{guo}. Platt scaling \cite{platt} turns a raw score into a probability, and the expected calibration error \cite{naeini} measures how well the probability matches reality. Selective classification \cite{geifman} lets a system abstain when it is unsure, which in our design is the ``Needs Human Review'' band. Provenance standards such as C2PA \cite{c2pa} attach a signed history to a file; because such metadata is easy to remove or forge, we display it but do not use it in the score.
+
+\section{Summary of the Survey}
+\begin{table}[htbp]
+\centering\small
+\caption{Summary of the surveyed work.}
+\begin{tabularx}{\linewidth}{@{}p{2.3cm}X X@{}}
+\toprule
+Work & Idea & Limitation for our goal\\
+\midrule
+Wang et al. \cite{wang} & CNN with blur and JPEG augmentation & Tied to the generator family seen in training\\
+Ojha et al. \cite{ojha} & Linear classifier on frozen CLIP features & Whole-image feature, single score, no calibration or explanation\\
+Corvi et al. \cite{corvi} & Analysis of diffusion-model images & Shows weakness under compression; no tool\\
+GenImage, OpenFake \cite{genimage,openfake} & Cross-generator benchmarks & Data only; sources can leak through format \cite{grommelt}\\
+ForensicHub \cite{forensichub} & Unified benchmark of many methods & A benchmark, not a tool for non-specialists\\
+FaceForensics++, Celeb-DF \cite{rossler,celebdf} & Face-manipulation datasets & One medium only\\
+DocTamper \cite{doctamper} & Tampered-text dataset & One medium only\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Gap and Our Contribution}
+The survey shows three gaps. First, the research is organised by medium, while a person receives files of every kind. Second, most detectors give a bare label without a calibrated confidence or an explanation. Third, results are often reported on the generators used in training. Our project (i) handles images, videos and documents behind one evidence interface, (ii) reports a calibrated Trust Score with a human-review band and an explanation, and (iii) evaluates every module on sources that were kept out of training. We do not claim to be the first unified system; the contribution is a requirements-driven design and an honest evaluation method built around unseen sources.

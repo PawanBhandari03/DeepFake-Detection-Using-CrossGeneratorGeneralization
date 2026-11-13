@@ -1,0 +1,109 @@
+% Project Stage 1 (preliminary) report. Compile with pdfLaTeX, run twice or three times so
+% the contents, list of figures and list of tables fill in. Edit names and PRNs in team.tex.
+\documentclass[12pt,a4paper]{report}
+\input{team}
+\input{preamble}
+\setlength{\parskip}{4pt}
+\begin{document}
+
+\pagenumbering{roman}
+\CoverPage{A PRELIMINARY REPORT ON}
+
+% ------------------------------------------------------------------ certificate
+\thispagestyle{empty}
+\begin{center}
+  \IfFileExists{bsiotr_logo.png}{\includegraphics[height=2.4cm]{bsiotr_logo.png}\par}{}
+  \vspace{8pt}
+  {\bfseries\large CERTIFICATE}
+\end{center}
+\vspace{6pt}
+\begin{center}
+  This is to certify that the project report entitled\\[6pt]
+  {\bfseries ``\ProjectTitle: \ProjectSubtitle''}\\[10pt]
+  Submitted by\\[4pt]
+  \begin{tabular}{@{}ll@{}}
+    \StudentOneName & Exam No.: \PRNOne\\
+    \StudentTwoName & Exam No.: \PRNTwo\\
+    \StudentThreeName & Exam No.: \PRNThree
+  \end{tabular}
+\end{center}
+\vspace{6pt}
+\onehalfspacing
+\noindent are bonafide students of this institute and the work has been carried out by them under the supervision of \textbf{\GuideName} and it is approved for the partial fulfillment of the requirement of Savitribai Phule Pune University, for the award of the degree of \textbf{Bachelor of Engineering} (Computer Engineering).
+\singlespacing
+\vspace{36pt}
+\noindent
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}cc}
+  \SignBlock{\GuideName}{Guide\\Department of Computer Engineering} &
+  \SignBlock{\HODName}{Head,\\Department of Computer Engineering}
+\end{tabular*}
+\vspace{30pt}
+\begin{center}
+  \SignBlock{\PrincipalName}{Principal,\\JSPM's, Bhivarabai Sawant Institute of Technology \& Research,\\Wagholi, Pune-412207}
+\end{center}
+\vspace{18pt}
+\noindent Place : Pune\\
+Date :\hfill External Examiner
+\newpage
+
+% ------------------------------------------------------------- acknowledgement
+\chapter*{Acknowledgement}
+\onehalfspacing
+We express our sincere gratitude towards our project guide \textbf{\GuideName}, who is also the Head of the Department of Computer Engineering, JSPM's Bhivarabai Sawant Institute of Technology \& Research, Wagholi, Pune, for her guidance, encouragement and regular feedback. Her suggestions on how to evaluate a detector honestly, and not only how to build one, shaped the whole project.
+
+We thank our Principal and all the teaching and non-teaching staff of the department for the facilities and support that were given to us. We also thank the friends and classmates who took part in our image tests by sharing their own photographs and the edits made from them.
+
+The project would not have been possible without the open datasets and tools created by the research community; we are grateful to their authors. Finally, we thank our families for their constant support.
+
+\vspace{30pt}
+\begin{flushright}
+  \textbf{\StudentOneName}\\
+  \textbf{\StudentTwoName}\\
+  \textbf{\StudentThreeName}
+\end{flushright}
+\newpage
+
+% ------------------------------------------------------------------- abstract
+\chapter*{Abstract}
+\onehalfspacing
+Realistic AI-generated images, face-swapped videos and edited documents are easy to produce today, yet the person who receives such a file needs one answer that can be understood and checked. This project builds a web-based system that accepts an image, a video or a document, passes it to a specialised analyser and turns the evidence into a calibrated Trust Score from 0 to 100, a verdict (Likely Authentic, Needs Human Review or Likely AI-generated / Manipulated), a heatmap and a plain-language explanation. The work is carried out in three phases: image, video and document.
+
+This preliminary report presents the requirements, the design and the first completed phase. The image analyser cuts ten $224\times224$ patches at native resolution, encodes them with a frozen CLIP ViT-L/14 model and scores them with a small logistic head trained on degraded copies of real and AI-generated images. On 20 generators that were not seen in training it reaches an AUC of 0.982, against 0.831 for an EfficientNet-B0 baseline, and it accepts 92\% of real photographs. A variant that never saw an OpenAI or Google image still catches 84\% of ChatGPT images. Tests on photographs taken by the team and their ChatGPT and Gemini edits, a check for the visible Gemini watermark, and notices for drawings, screenshots and compressed files complete the first phase. The video and document analysers are designed and are planned for the next phases.
+
+\medskip
+\noindent\textbf{Keywords:} deepfake detection, AI-generated images, cross-generator generalization, CLIP, calibration, explainable verification.
+\newpage
+
+% ---------------------------------------------------------------------- lists
+\singlespacing
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+
+\pagenumbering{arabic}
+\onehalfspacing
+\input{chapters/ch1}
+\input{chapters/ch2}
+\input{chapters/ch3}
+\input{chapters/ch4}
+\input{chapters/ch5}
+\input{chapters/ch6}
+\input{chapters/ch7}
+
+\chapter*{References}
+\addcontentsline{toc}{chapter}{References}
+\begingroup
+\small
+\singlespacing
+\begin{thebibliography}{99}
+\input{refs}
+\end{thebibliography}
+\endgroup
+
+\appendix
+\input{chapters/appendix}
+
+\end{document}

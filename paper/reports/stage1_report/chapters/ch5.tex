@@ -1,0 +1,209 @@
+\chapter{Implementation and Results of Phase 1}
+Phase 1 (image) is complete: the image analyser is implemented, evaluated and deployed as a web application. This chapter describes how it was built and what it achieves. Every number was measured on images that were kept out of training and comes from the result files stored with the project code.
+
+\section{Tools and Technologies}
+\begin{table}[htbp]
+\centering\small
+\caption{Tools and technologies.}
+\begin{tabularx}{\linewidth}{@{}p{3.6cm}X@{}}
+\toprule
+Tool & Purpose\\
+\midrule
+Python 3.11 & Main language\\
+PyTorch \cite{pytorch}, open\_clip & Loading the CLIP ViT-L/14 image encoder and computing features\\
+scikit-learn \cite{sklearn} & Logistic regression, Platt scaling, metrics (AUC, calibration)\\
+Pillow, NumPy, Matplotlib & Image handling, JPEG re-saving, heatmaps and figures\\
+Streamlit & Web interface and hosting on Streamlit Community Cloud\\
+Kaggle GPU & Computing the stored patch features once\\
+Git and GitHub & Version control; the hosted application redeploys when the main branch changes\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{How the Image Analyser Was Developed}
+We first built a prototype (v1) on CLIP features and then a second version (v2) trained on about 6,000 images, mostly from older generators. When it was shown to the guide the feedback was that it did not work well on new ChatGPT and Gemini images. We measured the problem: only 70\% of ChatGPT images and 14\% of JPEG-compressed images were caught. The final model (v3) was built to fix this:
+\begin{enumerate}
+  \item We switched to the full OpenFake dataset, with about sixty modern generators and test generators kept out of training, and added edited-image patches.
+  \item Every training image also contributes a randomly damaged copy (resized, blurred, JPEG quality 50--95).
+  \item Features were computed on a free Kaggle GPU: 414,433 patch features in total. The training set holds 214,440 patches.
+  \item Three heads were trained: \textbf{v3} (everything), a \textbf{proof model} (the same, but with every OpenAI and Google image removed) and a model without compression training, to show what that training adds.
+  \item The penalty strength, the Platt calibration and the verdict limits were chosen on validation data and not on the test data.
+\end{enumerate}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Improvement over the first prototype (v2); AI images caught unless stated.}
+\begin{tabularx}{\linewidth}{@{}X c c@{}}
+\toprule
+Test & Prototype v2 & Final v3\\
+\midrule
+All AI images, clean files & 81\% & 94\%\\
+After JPEG compression (quality 70) & 14\% & 66\%\\
+Half size plus JPEG & 50\% & 86\%\\
+In-the-wild images (Reddit) & 36\% & 73\%\\
+ChatGPT (GPT-Image-1.5) & 70\% & 89\%\\
+ChatGPT (GPT-Image-2) & 43\% & 92\%\\
+Gemini (Nano Banana Pro) & 66\% & 94\%\\
+Real photographs accepted as real & 94\% & 93\%\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Results on Unseen Generators}
+The test split has 1,200 real photographs and 2,192 AI images from 20 generators that are not in the training data. Table~\ref{tab:main} and Fig.~\ref{fig:auc} give the results. The 95\% confidence interval of the overall AUC is 0.978 to 0.986, and 92\% of the real photographs are correctly accepted.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Image analyser on the held-out test split (clean files).}\label{tab:main}
+\begin{tabular}{lcc}
+\toprule
+Test images & ROC-AUC & AI images caught\\
+\midrule
+All 20 unseen generators & 0.982 & 94\%\\
+ChatGPT, GPT-Image-1.5 & 0.972 & 89\%\\
+Gemini, Nano Banana Pro & 0.985 & 94\%\\
+Proof model, ChatGPT & 0.957 & 84\%\\
+Proof model, Gemini & 0.984 & 98\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The proof model never saw an OpenAI or Google image in training, yet it still separates ChatGPT and Gemini images from real photographs. This means that what the head learns is shared by many generators and is not a memory of one company's output.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_auc}
+  \caption{ROC-AUC on the held-out test split.}\label{fig:auc}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \OptionalGraphic[width=\linewidth]{figs/fig_cm_roc.png}
+  \caption{Confusion matrix and ROC curve on the held-out test split (threshold 0.5): 1,110 of 1,200 real photographs are accepted and 2,050 of 2,192 AI images are caught (accuracy 93.2\%).}\label{fig:cm}
+\end{figure}
+
+\subsection{Comparison with the Baseline}
+The specification asks for an unseen-generator AUC above an EfficientNet baseline. An EfficientNet-B0 \cite{effnet} trained on the same images reaches an AUC of 0.831 on the clean test files, against 0.982 for our analyser, and 0.841 against 0.984 when averaged over the named generators (Fig.~\ref{fig:base}). Both acceptance targets for images (AUC of at least 0.80 and above the baseline) are met.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_baseline}
+  \caption{Comparison with the EfficientNet-B0 baseline on the same test split.}\label{fig:base}
+\end{figure}
+
+\section{Robustness and Calibration}
+Pictures are resized and compressed every time they are shared, so we tested the model under degradations.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Image analyser under degradations (same 1,200 real and 2,192 AI test images).}
+\begin{tabular}{lccc}
+\toprule
+Condition & ROC-AUC & AI caught & Real accepted\\
+\midrule
+Clean files & 0.982 & 94\% & 92\%\\
+Half size and JPEG 75 & 0.950 & 86\% & 90\%\\
+JPEG quality 70 & 0.949 & 66\% & 97\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+With compression training, the AUC stays at 0.87 or higher under seven degradations. At JPEG quality 50 only 38\% of AI images are caught, and blur or downscaling make real photographs look synthetic more often (58\% and 72\% are still accepted). The expected calibration error fell from 0.106 to 0.034 on the test split after Platt scaling, which meets the target of 0.05.
+
+\begin{table}[htbp]
+\centering\small
+\caption{What the verdicts mean in practice (held-out test split).}
+\begin{tabular}{lccc}
+\toprule
+Image & Authentic & Needs review & AI-generated\\
+\midrule
+Real photograph, clean & 85\% & 12\% & 3\%\\
+AI image, clean & 3\% & 10\% & 87\%\\
+AI image, JPEG 70 & 19\% & 29\% & 52\%\\
+In-the-wild AI image (Reddit) & 12\% & 33\% & 56\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Tests on Photographs Taken by the Team}
+The datasets above contain downloaded images. To test the case that users care about most, real photographs that are edited by ChatGPT or Gemini, the team created its own test sets. Everyone supplied full-size phone photographs (about 12 megapixels, with camera data) and the edits made from the same photographs with the ChatGPT and Gemini apps. These images were used for testing only.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Team test sets (v3 model, no retraining).}
+\begin{tabularx}{\linewidth}{@{}X c c@{}}
+\toprule
+Measure & ChatGPT edits & Gemini edits\\
+\midrule
+Pairs (photograph and its edit) & 10 & 47\\
+ROC-AUC, edit against original & 0.95 & 0.92\\
+Pairs in which the edit scores as more AI-like than its original & 10 of 10 & 47 of 47\\
+Edits called AI-generated & 8 of 10 & 14 of 47\\
+Edits sent to human review & 2 of 10 & 28 of 47\\
+Edits called authentic & 0 of 10 & 5 of 47\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Of the 47 original photographs, 38 were called authentic, 8 were sent to human review and 1 was called AI-generated. The 47 Gemini pairs come from three independent sets (10, 12 and 25 pairs). The ChatGPT figures come from the first set, which has 10 pairs, so they are less certain.
+
+\textbf{Visible Gemini watermark.} The watermark check found the star in all 47 Gemini edits, and it did not fire on any of 62 real photographs, 10 ChatGPT edits or 60 Nano-Banana edits from a public research dataset (which carry no visible star). Because of this, a Gemini-app download is called AI-generated by the application even when the model alone is unsure; the model-only figures above are reported separately.
+
+\textbf{Notices for unusual files.} Across 50 photographs (25 real and 25 Gemini) the drawing notice did not appear at all, and it fired on 3 of 4 plain graphics. A hand-drawn image uploaded during a demonstration scored 45 out of 100 and was sent to human review.
+
+\section{Experiments That Did Not Help}
+Two ideas were tested and not adopted, and we keep them in the report because they show how the final design was chosen.
+\begin{itemize}
+  \item \textbf{Scoring only the most suspicious patches} (to catch small edited regions) did not help enough to replace the average over all patches.
+  \item \textbf{Fine-tuning the head with 150 Nano-Banana edit pairs} from a public dataset raised the score on held-out pairs of the same dataset from 0.75 to 0.94, but lowered the AUC on the team test from 0.89 to 0.875. The acceptance rules had been fixed in advance, so the new head was rejected and v3 was kept.
+\end{itemize}
+
+\section{The Web Application}
+The application is hosted on Streamlit Community Cloud and redeploys automatically from GitHub. Fig.~\ref{fig:ui1} to Fig.~\ref{fig:ui5} show its main screens.
+
+\begin{figure}[htbp]
+  \centering
+  \OptionalGraphic[width=0.95\linewidth,keepaspectratio]{figs/app_landing.png}
+  \caption{Start page of the application.}\label{fig:ui1}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \OptionalGraphic[width=0.95\linewidth,keepaspectratio]{figs/app_result_ai.png}
+  \caption{Result for an AI-generated image: Trust Score, verdict, explanation and heatmap.}\label{fig:ui2}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \OptionalGraphic[width=0.95\linewidth,keepaspectratio]{figs/app_result_real.png}
+  \caption{Result for a real photograph.}\label{fig:ui3}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \OptionalGraphic[width=0.95\linewidth,keepaspectratio]{figs/app_result_watermark.png}
+  \caption{Result for a full-size Gemini image: the red alert reports the visible Gemini watermark and the verdict is AI-generated.}\label{fig:ui4}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \OptionalGraphic[width=0.95\linewidth,keepaspectratio]{figs/app_result_drawing.png}
+  \caption{A drawing is outside what the detector was built for: the application shows a notice and sets the verdict to human review.}\label{fig:ui5}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \OptionalGraphic[width=0.95\linewidth,keepaspectratio]{figs/app_crossgen.png}
+  \caption{The Cross-Generator Test page shows the held-out results.}\label{fig:ui6}
+\end{figure}
+
+\section{Limitations}
+\begin{itemize}
+  \item Results exist for the image analyser only, from one training run. The video and document analysers are designed but not built.
+  \item The head is linear and the heatmap is coarse ($3\times3$ patches). When only a small region of a photograph is machine-made, the average over patches dilutes the signal.
+  \item Compression and resizing weaken all detectors \cite{corvi}. In an early test, copies of the same photographs that had been sent through a messaging app were separated from their edits much less well (AUC 0.66 for ChatGPT and 0.54 for Gemini) than the full-size originals. The application warns about files of this kind.
+  \item Gemini edits are ranked well but are more often sent to human review than ChatGPT edits (28 of 47 against 2 of 10, as Table above shows); the watermark check covers Gemini-app downloads but not images that come by other routes or have the mark cropped away.
+  \item The team test sets are small and come from few people with similar phones, so they are indicative and not exact.
+  \item Several test generators are newer versions of generators in the training families \cite{openfake}, so the proof model is the strictest test.
+  \item The Trust Score is a screening aid and not forensic proof. A real photograph that is labelled as AI-generated can harm its author, which is why uncertain cases go to a person.
+\end{itemize}
