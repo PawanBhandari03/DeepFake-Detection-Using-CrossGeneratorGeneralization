@@ -1,6 +1,6 @@
 # Project reports in LaTeX (Overleaf)
 
-Three documents for **Unified Content Authenticity Verification System** (The Perceptrons), written in the format of the department's earlier project reports (Abstract, Synopsis, Stage 1 / preliminary report).
+Three documents and the final presentation for **Deepfake Detection with Cross-Generator Generalization** (The Perceptrons), written in the format of the department's earlier project reports (Abstract, Synopsis, Stage 1 / preliminary report).
 
 | Folder | Document | Pages (approx.) |
 |---|---|---|

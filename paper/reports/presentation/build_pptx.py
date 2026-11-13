@@ -234,9 +234,9 @@ for sh in s1.shapes:
         continue
     pars = sh.text_frame.paragraphs
     if sh.name == "Title 1":
-        set_par_text(pars[3], "“UNIFIED CONTENT AUTHENTICITY VERIFICATION SYSTEM: DEEPFAKE DETECTION WITH CROSS-GENERATOR GENERALIZATION AND DOCUMENT TAMPER LOCALIZATION”")
+        set_par_text(pars[3], "“DEEPFAKE DETECTION WITH CROSS‑GENERATOR GENERALIZATION”")
         for r in pars[3].runs:
-            r.font.size = Pt(20)
+            r.font.size = Pt(28)
         for p in (pars[1], pars[2]):
             for r in p.runs:
                 r.font.size = Pt(26)
