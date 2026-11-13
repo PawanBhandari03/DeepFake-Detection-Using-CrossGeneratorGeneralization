@@ -459,6 +459,7 @@ Copy this block for each week.
 - Done (7 Nov): finer 6×6 heatmap option in the app; region-based verdict tested on 764 held-out edited images and not adopted (gain under 2:1 against the cost, [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md) Entry 29); design documents aligned with the final model; EfficientNet baseline run on Kaggle.
 - Done (10 Nov): team test of 10 real phone photos and their ChatGPT and Gemini versions (compressed JPEGs): v3 did not separate them reliably (AUC 0.66 ChatGPT, 0.54 Gemini; 3 of 10 real photos called AI); 20 full-size ChatGPT PNGs: 17 called AI. Stated as a known limitation (small or compressed images). See [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md) Entry 31.
 - Done (10 Nov, evening): re-test with full-size originals: AUC 0.95 real vs ChatGPT, 0.83 real vs Gemini; Gemini edits mostly land in Needs Human Review. The image section is closed with these limits stated.
+- Done (13 Nov): research paper updated (team-test numbers, clickable references); Abstract, Synopsis and Stage 1 report in LaTeX; final presentation in the department format. See [Walkthrough 02](docs/walkthroughs/02_v3_work_log.md) Entry 37. Left for the team: PRN numbers and the principal's name.
 
 ---
 
