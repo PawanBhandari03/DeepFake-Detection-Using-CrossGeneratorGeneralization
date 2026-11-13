@@ -38,7 +38,7 @@
 % ---- headings ------------------------------------------------------------------
 \makeatletter
 \@ifundefined{chapter}{}{%
-  \titleformat{\chapter}[display]{\centering\bfseries\Large}{CHAPTER \thechapter}{8pt}{\Large\MakeUppercase}
+  \titleformat{\chapter}[display]{\centering\bfseries\Large}{\MakeUppercase{\chaptertitlename} \thechapter}{8pt}{\Large\MakeUppercase}
   \titlespacing*{\chapter}{0pt}{-10pt}{22pt}}
 \makeatother
 \titleformat{\section}{\bfseries\large}{\thesection}{0.6em}{}
