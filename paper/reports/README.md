@@ -39,7 +39,7 @@ Every result comes from the project files: `prototype/results/*.json`, `paper/an
 ## Compiled PDFs and the presentation
 
 * `pdf/` holds the compiled PDFs (abstract 1 page, synopsis 12 pages, Stage 1 report 47 pages) and a PDF copy of the presentation. PDFs are not stored in git; rebuild them with any LaTeX (Overleaf, or Tectonic: `tectonic main.tex` inside each folder).
-* `presentation/Final_Project_Presentation.pptx` follows the department's sample deck exactly (same theme, logos, fonts, slide order) and has 42 slides with speaker notes on every slide. Rebuild: `python paper/reports/presentation/make_diagrams.py <tectonic.exe>` then `python paper/reports/presentation/build_pptx.py "<sample deck .pptx>"`.
+* `presentation/Final_Project_Presentation.pptx` follows the department's sample deck exactly (same theme, logos, fonts, slide order) and has 40 slides with speaker notes on every slide. Rebuild: `python paper/reports/presentation/make_diagrams.py <tectonic.exe>` then `python paper/reports/presentation/build_pptx.py "<sample deck .pptx>"`.
 * The PRN / exam numbers on the title slide are blank brackets to fill in.
 
 All three LaTeX projects compile without errors (checked with Tectonic 0.17, 13 Nov 2026); only line-spacing warnings remain.

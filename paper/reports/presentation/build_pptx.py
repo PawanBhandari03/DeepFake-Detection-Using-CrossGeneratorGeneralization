@@ -16,7 +16,9 @@ from PIL import Image, ImageDraw, ImageFont
 from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.oxml.ns import qn
+from pptx.enum.text import MSO_ANCHOR
 from pptx.util import Emu, Inches, Pt
+import math
 from lxml import etree
 
 HERE = Path(__file__).resolve().parent
@@ -74,11 +76,12 @@ def new_slide(title: str, size: int = 36):
     return s
 
 
-def fill_body(slide, items, size: int = 20, left=0.5, top=1.85, width=9.0, height=5.3, bold_first: bool = False):
+def fill_body(slide, items, size: int = 20, left=0.6, top=1.75, width=8.8, height=5.45, bold_first: bool = False, middle: bool = True):
     body = slide.placeholders[1]
     body.left, body.top, body.width, body.height = Inches(left), Inches(top), Inches(width), Inches(height)
     tf = body.text_frame
     tf.word_wrap = True
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE if middle else MSO_ANCHOR.TOP
     first = True
     for it in items:
         level, text = (it if isinstance(it, tuple) else (0, it))
@@ -135,15 +138,30 @@ def set_cell(cell, text, size=14, bold=False, align=None):
     r.font.name = "Times New Roman"
     if align is not None:
         p.alignment = align
+    cell.vertical_anchor = MSO_ANCHOR.MIDDLE
     cell.margin_left = cell.margin_right = Inches(0.06)
     cell.margin_top = cell.margin_bottom = Inches(0.03)
 
 
-def table_slide(title, header, rows, widths, size=14, note="", top=1.7, row_h=0.5, title_size=36):
+def table_slide(title, header, rows, widths, size=14, note="", top=None, row_h=0.45, title_size=36):
     s = new_slide(title, title_size)
     ph = s.placeholders[1]
     ph._element.getparent().remove(ph._element)
-    shape = s.shapes.add_table(len(rows) + 1, len(header), Inches(0.42), Inches(top), Inches(sum(widths)), Inches(row_h * (len(rows) + 1)))
+
+    def lines(text, w):                                   # rough number of wrapped lines in a cell
+        per_line = max(1.0, (w - 0.14) / (0.52 * size / 72))
+        return max(1, math.ceil(len(text) / per_line))
+
+    heights = []
+    for row in [header] + rows:
+        n = max(lines(v, w) for v, w in zip(row, widths))
+        heights.append(max(row_h, n * size * 1.2 / 72 + 0.12))
+    total = sum(heights)
+    area_top, area_h = 1.7, 5.5
+    if top is None:
+        top = area_top + max(0.0, (area_h - total) / 2)
+    left = (SW - sum(widths)) / 2
+    shape = s.shapes.add_table(len(rows) + 1, len(header), Inches(left), Inches(top), Inches(sum(widths)), Inches(total))
     tbl = shape.table
     # plain grid style (black lines, no coloured fill) as in the sample
     tblPr = tbl._tbl.tblPr
@@ -153,6 +171,8 @@ def table_slide(title, header, rows, widths, size=14, note="", top=1.7, row_h=0.
         tblPr.set(el, "0")
     for j, w in enumerate(widths):
         tbl.columns[j].width = Inches(w)
+    for i, h in enumerate(heights):
+        tbl.rows[i].height = Inches(h)
     for j, h in enumerate(header):
         set_cell(tbl.cell(0, j), h, size, True, 2)
     for i, row in enumerate(rows, start=1):
@@ -262,7 +282,7 @@ content_slide("Introduction", [
     "Data Preprocessing and Augmentation", "CLIP Encoder and Trained Head", "System Requirements", "Project Plan", "Results", "Test Cases",
     "Applications", "Conclusion", "Future Enhancement", "References"], size=15,
     note="Outline of the talk. The order follows the department format: problem, background, design diagrams, algorithm, results, tests, conclusion.",
-    top=2.2, height=5.0, left=1.2, width=8.7)
+    top=2.2, height=5.0, left=1.2, width=8.7, middle=False)
 # the sample shows a small 'Content :' label under the title on this slide
 cb = prs.slides[1].shapes.add_textbox(Inches(1.2), Inches(1.55), Inches(3.4), Inches(0.7))
 r = cb.text_frame.paragraphs[0].add_run()
@@ -272,7 +292,7 @@ r.font.name, r.font.size, r.font.bold = "Times New Roman", Pt(28), True
 # ================================================================== 3 problem statement
 content_slide("Problem Statement", [
     "To develop a web-based, explainable system that checks whether an image, a video or a document is authentic, AI-generated or tampered with, "
-    "and that keeps working on generators that were not seen in training."], size=22, top=1.9, height=3.0,
+    "and that keeps working on generators that were not seen in training."], size=24,
     note="One sentence: one tool, three kinds of files, a score people can understand, and it must work on new AI tools, not only the ones it was trained on.")
 
 # ================================================================== 4 introduction
@@ -290,7 +310,7 @@ content_slide("Objectives", [
     "To explain every verdict with a heatmap and plain-language sentences.",
     "To run on a CPU within 2.7 GB of memory and never store uploaded files.",
     "Next phases: face-manipulated videos and tampered documents."],
-    size=20, top=1.95, note="Five objectives. The first four are achieved for images in Phase 1; video and documents are the next two phases.")
+    size=20, note="Five objectives. The first four are achieved for images in Phase 1; video and documents are the next two phases.")
 
 # ================================================================== 6-8 literature survey
 LIT = [
@@ -307,11 +327,10 @@ LIT = [
     ("06", "OpenFake: An Open Dataset and Platform Toward Real-World Deepfake Detection", "V. Livernoche", "2025",
      "Real photographs and about sixty generators, with held-out test generators; used in our training."),
 ]
-for k in range(3):
-    table_slide("Literature Survey", ["Sr. No.", "Paper Name", "Authors", "Publication Year", "Conclusion"],
-                [list(r) for r in LIT[2 * k:2 * k + 2]], [0.55, 2.45, 1.35, 1.2, 3.2], size=14, row_h=0.9, title_size=36,
-                note="Related work. The common gap: results on the training generators are good, results on new generators and on compressed files are not. "
-                     "Our design answers this with CLIP features, degraded training copies and tests on unseen generators.")
+table_slide("Literature Survey", ["Sr. No.", "Paper Name", "Authors", "Publication Year", "Conclusion"],
+            [list(r) for r in LIT], [0.55, 2.75, 1.15, 1.05, 3.7], size=12, row_h=0.4,
+            note="Related work. The common gap: results on the training generators are good, results on new generators and on compressed files are not. "
+                 "Our design answers this with CLIP features, degraded training copies and tests on unseen generators.")
 
 # ================================================================== 9 system architecture
 s = picture_slide("System Architecture", DIAG / "fig_architecture.png", box=(1.2, 1.55, 7.6, 4.55),
@@ -331,7 +350,7 @@ r.hyperlink.address = "https://huggingface.co/datasets/ComplexDataLab/OpenFake"
 # ================================================================== 10 UML list + diagram slides
 content_slide("UML Diagrams", [
     "Use Case Diagram", "DFD Level 0", "DFD Level 1", "Control Flow Diagram", "Sequence Diagram", "Class Diagram"],
-    size=22, top=2.1, note="The next six slides show the diagrams. Each one is explained in the speaker notes.")
+    size=24, left=2.5, width=5.0, note="The next six slides show the diagrams. Each one is explained in the speaker notes.")
 picture_slide("Use Case Diagram", DIAG / "fig_usecase.png", note=(
     "Two kinds of users. The User uploads a file, sees the Trust Score and verdict, the heatmap, the explanation, and can download a report. "
     "The project team trains and updates the models, evaluates them on unseen generators and updates the calibration."))
@@ -407,7 +426,7 @@ content_slide("Deployment: Streamlit", [
 
 # ================================================================== 23 requirements
 s = new_slide("Hardware/Software Requirements", 32)
-fill_body(s, ["Hardware Requirements :"], size=24, top=1.7, height=0.5)
+fill_body(s, ["Hardware Requirements :"], size=24)
 body = s.placeholders[1]
 for p in body.text_frame.paragraphs:
     for r in p.runs:
@@ -437,7 +456,7 @@ table_slide("Project Plan", ["Work Task", "Description", "Duration"], [
     ["System testing", "Unseen-source tests, team photographs, notices and checks", "In every phase"],
     ["Initial Report", "Preliminary (Stage 1) report, synopsis, abstract", "Done"],
     ["Final Report", "Final report and research paper", "Week 26"]],
-    [2.2, 3.7, 2.9], size=14, row_h=0.8, note="Three phases, one medium at a time. Each phase ends with a working demonstration. Phase 1 (image) is finished.")
+    [2.2, 3.7, 2.9], size=14, row_h=0.55, note="Three phases, one medium at a time. Each phase ends with a working demonstration. Phase 1 (image) is finished.")
 picture_slide("Project Schedule", DIAG / "fig_gantt.png", note="The same plan as a chart: green bars are finished work, blue bars are planned.")
 
 # ================================================================== 26-31 results (screenshots)
@@ -470,7 +489,7 @@ table_slide("Tests on Team Photographs", ["Measure", "ChatGPT edits", "Gemini ed
     ["Edits called AI-generated", "8 of 10", "14 of 47"],
     ["Edits sent to human review", "2 of 10", "28 of 47"],
     ["Original photographs called authentic", "9 of 10", "38 of 47"]],
-    [4.6, 2.1, 2.1], size=16, row_h=0.6, note=(
+    [4.6, 2.1, 2.1], size=16, row_h=0.55, note=(
         "Full-size phone photographs taken by the team and their edits made with the ChatGPT and Gemini apps; used for testing only. "
         "The sets are small, so the numbers are indicative. Gemini edits are ranked well but more often sent to human review; the watermark check, reported separately, covers Gemini-app downloads."))
 
@@ -487,7 +506,7 @@ TC = [
     ["009", "PDF document", "PDF file (Phase 3)", "Clear error message", "Error", "P"],
 ]
 table_slide("Test Cases", ["Test case ID", "Test case", "Test case i/p", "Actual result", "Expected result", "P/F"], TC,
-            [0.75, 1.75, 2.05, 2.0, 1.55, 0.6], size=13, row_h=0.47, top=1.6,
+            [0.75, 1.75, 2.05, 2.0, 1.55, 0.6], size=13, row_h=0.45,
             note="Nine test cases. 001 to 005 were run on the application with images from the team test sets; 006 to 009 were run on the file validation code with real bad files. "
                  "Test 009 shows the present behaviour: the image analyser refuses a PDF with a clear message; the document analyser is planned for Phase 3.")
 
@@ -531,9 +550,10 @@ REFS = [
 for part in (0, 1):
     s = new_slide("References")
     body = s.placeholders[1]
-    body.left, body.top, body.width, body.height = Inches(0.5), Inches(1.75), Inches(9.0), Inches(5.4)
+    body.left, body.top, body.width, body.height = Inches(0.5), Inches(1.75), Inches(9.0), Inches(5.45)
     tf = body.text_frame
     tf.word_wrap = True
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
     for k, (txt, url) in enumerate(REFS[part * 6:part * 6 + 6]):
         p = tf.paragraphs[0] if k == 0 else tf.add_paragraph()
         r = p.add_run()
