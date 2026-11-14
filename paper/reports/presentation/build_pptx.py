@@ -26,7 +26,7 @@ DIAG = HERE / "diagrams"
 FIGS = HERE.parent / "shared" / "figs"
 PAPER_FIGS = HERE.parent.parent / "figures"
 
-TEMPLATE = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(r"C:\Users\bhand\Downloads\BE\Final Project Presentation.pptx")
+TEMPLATE = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(r"C:\Users\bhand\Downloads\BE\Old samples (brain tumour project)\Final Project Presentation.pptx")
 OUT = Path(sys.argv[2]) if len(sys.argv) > 2 else HERE / "Final_Project_Presentation.pptx"
 
 prs = Presentation(str(TEMPLATE))
