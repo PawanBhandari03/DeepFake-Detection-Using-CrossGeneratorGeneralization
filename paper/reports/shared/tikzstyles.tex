@@ -9,6 +9,7 @@
 % ---- TikZ styles shared by all diagrams ----------------------------------------
 \tikzset{
   >=Stealth,
+  every node/.append style={execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
   box/.style={rectangle,rounded corners=2pt,draw=cLine,thick,fill=cBlue,align=center,
               minimum height=9mm,inner sep=4pt,font=\small},
   boxg/.style={box,fill=cGreen},

@@ -42,7 +42,7 @@ PREAMBLE = BS + r"""documentclass[border=10pt]{standalone}
 \end{document}
 """
 
-FIGS = ["fig_architecture", "fig_training", "fig_image_pipeline", "fig_dfd0", "fig_dfd1", "fig_usecase", "fig_flow",
+FIGS = ["fig_architecture", "fig_training", "fig_image_pipeline", "fig_dfd0", "fig_dfd1", "fig_dfd2", "fig_usecase", "fig_flow",
         "fig_sequence", "fig_class", "fig_gantt", "fig_existing"]
 PLAIN = ["fig_auc", "fig_baseline"]          # pgfplots charts have their own size
 

@@ -349,17 +349,25 @@ r.hyperlink.address = "https://huggingface.co/datasets/ComplexDataLab/OpenFake"
 
 # ================================================================== 10 UML list + diagram slides
 content_slide("UML Diagrams", [
-    "Use Case Diagram", "DFD Level 0", "DFD Level 1", "Control Flow Diagram", "Sequence Diagram", "Class Diagram"],
-    size=24, left=2.5, width=5.0, note="The next six slides show the diagrams. Each one is explained in the speaker notes.")
+    "Use Case Diagram", "DFD Level 0", "DFD Level 1", "DFD Level 2", "Control Flow Diagram", "Sequence Diagram", "Class Diagram"],
+    size=24, left=2.5, width=5.0, note="The next seven slides show the diagrams. Each one is explained in the speaker notes.")
 picture_slide("Use Case Diagram", DIAG / "fig_usecase.png", note=(
-    "Two kinds of users. The User uploads a file, sees the Trust Score and verdict, the heatmap, the explanation, and can download a report. "
-    "The project team trains and updates the models, evaluates them on unseen generators and updates the calibration."))
+    "Every function of the system and three actors. The User uploads or tries a sample image, chooses the detector model, views the Trust Score and verdict, "
+    "the heatmap, the explanation, metadata, spectrum and ELA, the cross-generator results, and (planned) downloads a report. Uploading always includes validating the file "
+    "and analysing the image; viewing the verdict includes calibration. Notices, the Gemini watermark alert and the finer heatmap extend the result only when they apply. "
+    "The project team collects datasets, extracts features, trains the head, calibrates, evaluates on unseen generators, updates the watermark rules and deploys; "
+    "the hosting platform (Streamlit Cloud) takes part in deployment."))
 picture_slide("DFD Level 0", DIAG / "fig_dfd0.png", note=(
-    "Context diagram: the whole system is one process. The user sends a file and receives score, verdict, heatmap and text. "
-    "The team supplies trained heads and calibration and receives evaluation results. Public datasets and CLIP weights feed the training."))
+    "Context diagram: the whole system is one process. The user sends an image and the model choice and gets the Trust Score, verdict, heatmap, explanation, notices and report, "
+    "or an error. The project team sends training data and settings and gets evaluation results. Public datasets give labelled images; the model hub gives the CLIP weights."))
 picture_slide("DFD Level 1", DIAG / "fig_dfd1.png", note=(
-    "Four processes: 1.0 validate the upload (bad files get an error message), 2.0 analyse with the routed analyser using the stored heads, "
-    "3.0 calibrate and score using the stored calibration limits, 4.0 explain and report back to the user."))
+    "Six processes and five data stores. 1.0 validates and decodes the upload (bad files return an error). 2.0 analyses the image with the CLIP encoder (D1) and the trained head (D2). "
+    "3.0 calibrates the score with D3 and assigns the verdict. 4.0 checks the file type and provenance with the watermark template and notice rules (D4). "
+    "5.0 builds the explanation and report for the user. 6.0, run offline by the team, trains a new head, stores features (D5) and writes a new calibration."))
+picture_slide("DFD Level 2", DIAG / "fig_dfd2.png", note=(
+    "Processes 2.0 and 3.0 opened up. 2.1 cut ten patches at native resolution, 2.2 re-save them as JPEG quality 95, 2.3 encode them with CLIP, 2.4 score each patch with the head, "
+    "2.5 average the scores and build the 3 x 3 heatmap grid. Then 3.1 Platt scaling gives p, 3.2 computes the Trust Score T = round(100(1 - p)), and 3.3 assigns the band "
+    "(54 or more authentic, 17 or less AI-generated, otherwise human review)."))
 picture_slide("Control Flow Diagram", DIAG / "fig_flow.png", note=(
     "Step by step: read the true file type from the bytes, check size, decode; if invalid show a clear error. Otherwise route to the analyser, "
     "get the evidence record, calibrate to a Trust Score, and choose the band: 54 or more Likely Authentic, 17 or less Likely AI-generated, otherwise Needs Human Review."))

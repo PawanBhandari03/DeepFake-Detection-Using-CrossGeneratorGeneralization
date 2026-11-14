@@ -61,13 +61,27 @@ Only $\mathbf{w}$ and $b$ are trained, by L2-regularised logistic regression wit
 \textbf{Document analyser (designed).} Pages are rendered and read by OCR \cite{tesseract}. Error-level analysis \cite{krawetz}, spatial-rich-model residuals \cite{fridrich} and DCT features are stacked as a second input stream next to the RGB page of a dual-stream U-Net \cite{unet,zhou} with an EfficientNet encoder \cite{effnet}. It is trained with binary cross-entropy plus a Dice term \cite{vnet} on synthetic forgeries (text replacement, copy-move, splicing) with exact masks and scanner-like noise, and tested on human-made forgeries and DocTamper \cite{doctamper}. Rule checks (line items against the total, dates, font heights, PDF modification history) add flags that are auxiliary evidence and never proof.
 
 \section{Data Flow Diagrams}
-Fig.~\ref{fig:dfd0} shows the context diagram (level 0) and Fig.~\ref{fig:dfd1} the first level.
+The data flow diagrams show how data moves through the system at three levels of detail. External entities are drawn as filled rectangles, processes as circles, data stores as grey boxes, and every arrow is labelled with the data it carries.
+
+\subsection{DFD Level 0 (Context Diagram)}
+At level 0 the whole system is one process (Fig.~\ref{fig:dfd0}). The user sends an image file and the chosen detector model and receives the Trust Score, verdict, heatmap, explanation, notices and report, or an error message. The project team supplies training data and settings and receives evaluation results and calibration reports. Public datasets supply labelled real and AI-generated images, and a model hub supplies the pretrained CLIP encoder weights.
 
 \begin{figure}[htbp]
   \centering
   \input{figs/fig_dfd0}
-  \caption{Data flow diagram, level 0.}\label{fig:dfd0}
+  \caption{Data flow diagram, level 0 (context diagram).}\label{fig:dfd0}
 \end{figure}
+
+\subsection{DFD Level 1}
+Level 1 opens the system into six processes and five data stores (Fig.~\ref{fig:dfd1}).
+\begin{itemize}
+  \item \textbf{1.0 Validate and decode upload} reads the file type from the bytes, checks the size and decodes the image; an invalid file goes back to the user as an error message.
+  \item \textbf{2.0 Analyse image} cuts the patches, encodes them with the CLIP encoder (D1) and scores them with the trained head (D2). It sends the image score to 3.0 and the patch scores to 5.0 for the heatmap.
+  \item \textbf{3.0 Calibrate and assign verdict} turns the score into a probability with the calibration (D3) and assigns the band.
+  \item \textbf{4.0 Check file type and provenance} uses the watermark template and notice rules (D4) to detect drawings, small or recompressed files and the visible Gemini watermark, and reads the camera and C2PA metadata.
+  \item \textbf{5.0 Explain and build report} combines the verdict, the patch scores and the notices into the result card, the heatmap, the explanation and the report for the user.
+  \item \textbf{6.0 Train and calibrate model} (offline, run by the project team) takes labelled images from the public datasets, stores patch features (D5), trains a new head (D2), chooses a new calibration (D3) and returns the evaluation results.
+\end{itemize}
 
 \begin{figure}[htbp]
   \centering
@@ -75,8 +89,24 @@ Fig.~\ref{fig:dfd0} shows the context diagram (level 0) and Fig.~\ref{fig:dfd1} 
   \caption{Data flow diagram, level 1.}\label{fig:dfd1}
 \end{figure}
 
+\subsection{DFD Level 2}
+Level 2 opens the two central processes (Fig.~\ref{fig:dfd2}). Process 2.0 consists of 2.1 cutting ten patches at native resolution, 2.2 re-saving each patch as JPEG quality 95, 2.3 encoding the patches with CLIP (D1), 2.4 scoring each patch with the head (D2) and 2.5 averaging the scores and building the $3\times3$ grid for the heatmap. Process 3.0 consists of 3.1 Platt scaling with the parameters $a$ and $c$ (D3), 3.2 computing the Trust Score $T=\mathrm{round}(100(1-p))$ and 3.3 assigning the verdict band with the limits 54 and 17 (D3).
+
+\begin{figure}[htbp]
+  \centering
+  \input{figs/fig_dfd2}
+  \caption{Data flow diagram, level 2: processes 2.0 and 3.0.}\label{fig:dfd2}
+\end{figure}
+
 \section{Use-Case Diagram}
-The user uploads a file and receives the score, the evidence and the report; the project team trains and updates the models and the calibration (Fig.~\ref{fig:uc}).
+The use-case diagram (Fig.~\ref{fig:uc}) shows every function of the system and the three actors that use it.
+\begin{itemize}
+  \item \textbf{User:} uploads an image or tries a sample image, chooses the detector model, views the Trust Score and verdict, the patch heatmap, the explanation, the metadata, frequency spectrum and error-level analysis, views the cross-generator results and (planned) downloads a report.
+  \item \textbf{Included use cases:} uploading always includes validating the file and analysing the image; viewing the Trust Score always includes calibrating the score and assigning the band.
+  \item \textbf{Extending use cases:} a notice for drawings, small or compressed files and the Gemini watermark alert extend the verdict only when they apply; the finer $6\times6$ heatmap extends the heatmap when the user asks for it.
+  \item \textbf{Project team (administrator):} collects labelled datasets, extracts patch features on a cloud GPU, trains the classifier head, calibrates and sets the verdict limits, evaluates on unseen generators, updates the watermark and notice rules and deploys the application.
+  \item \textbf{Hosting platform (Streamlit Cloud):} takes part in deploying the application.
+\end{itemize}
 
 \begin{figure}[htbp]
   \centering

@@ -1,18 +1,56 @@
-% Use-case diagram
-\resizebox{0.96\linewidth}{!}{%
-\begin{tikzpicture}
-\draw[thick,cLine,rounded corners=3pt,fill=white] (2.2,-6.6) rectangle (12.6,1.3);
-\node[font=\small\bfseries] at (7.4,0.9) {Deepfake detection system};
-\node[actor,text width=1.8cm] (user) at (0,-2.6) {User};
-\node[actor,text width=1.8cm] (admin) at (14.8,-2.6) {Team\\(administrator)};
-\node[usecase,text width=3.3cm] (u1) at (5.0,-0.2) {Upload an image, video or document};
-\node[usecase,text width=3.3cm] (u2) at (5.0,-1.6) {View Trust Score and verdict};
-\node[usecase,text width=3.3cm] (u3) at (5.0,-3.0) {View heatmap or evidence};
-\node[usecase,text width=3.3cm] (u4) at (5.0,-4.4) {Read plain-language explanation};
-\node[usecase,text width=3.3cm] (u5) at (5.0,-5.8) {Check metadata, download report};
-\node[usecase,text width=3.3cm,fill=cOrange] (a2) at (9.9,-1.2) {Train and update heads};
-\node[usecase,text width=3.3cm,fill=cOrange] (a3) at (9.9,-3.0) {Evaluate on unseen generators};
-\node[usecase,text width=3.3cm,fill=cOrange] (a4) at (9.9,-4.8) {Update calibration and verdict limits};
-\foreach \u in {u1,u2,u3,u4,u5}{\draw[thick,cLine] (user) -- (\u);}
-\foreach \a in {a2,a3,a4}{\draw[thick,cLine] (admin) -- (\a);}
+% Use-case diagram (UML): every function of the system, with include / extend relations and three actors
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  uc/.style={usecase,text width=3.3cm,minimum height=9mm},
+  uca/.style={usecase,text width=3.3cm,minimum height=9mm,fill=cOrange},
+  rel/.style={->,dashed,thick,draw=cLine},
+  lab/.style={font=\scriptsize,fill=white,inner sep=1pt},
+  stick/.pic={\draw[thick,cLine] (0,0.62) circle (0.24); \draw[thick,cLine] (0,0.38)--(0,-0.3) (-0.42,0.15)--(0.42,0.15) (0,-0.3)--(-0.32,-0.85) (0,-0.3)--(0.32,-0.85);}]
+% ---- system boundary
+\draw[thick,cLine,rounded corners=4pt,fill=white] (2.3,1.5) rectangle (19.4,-12.6);
+\node[font=\bfseries] at (10.85,1.0) {Deepfake Detection System};
+% ---- actors
+\pic at (0,-5.4) {stick}; \node[font=\small\bfseries] at (0,-6.6) {User};
+\pic at (21.9,-3.4) {stick}; \node[font=\small\bfseries,align=center] at (21.9,-4.75) {Project team\\(administrator)};
+\pic at (21.9,-10.4) {stick}; \node[font=\small\bfseries,align=center] at (21.9,-11.75) {Hosting platform\\(Streamlit Cloud)};
+% ---- user use cases (left column)
+\node[uc] (u1) at (5.0,-0.2) {Upload an image};
+\node[uc] (u2) at (5.0,-1.6) {Try a sample image};
+\node[uc] (u3) at (5.0,-3.0) {Choose detector model};
+\node[uc] (u4) at (5.0,-4.4) {View Trust Score and verdict};
+\node[uc] (u5) at (5.0,-5.8) {View patch heatmap};
+\node[uc] (u6) at (5.0,-7.2) {Read the explanation};
+\node[uc] (u7) at (5.0,-8.6) {View metadata, spectrum and ELA};
+\node[uc] (u8) at (5.0,-10.0) {View cross-generator results};
+\node[uc] (u9) at (5.0,-11.4) {Download report (planned)};
+% ---- included / extending use cases (middle column, beside the use case they belong to)
+\node[uc] (m1) at (10.9,-0.2) {Validate file type and size};
+\node[uc] (m2) at (10.9,-1.6) {Analyse image (patches, CLIP, head)};
+\node[uc] (m4) at (10.9,-3.0) {Show notice: drawing, small or compressed file};
+\node[uc] (m3) at (10.9,-4.4) {Calibrate score, assign band};
+\node[uc] (m5) at (10.9,-5.8) {Show Gemini watermark alert};
+\node[uc] (m6) at (10.9,-7.2) {Show finer $6\times6$ heatmap};
+% ---- administrator use cases (right column)
+\node[uca] (a1) at (16.6,-0.2) {Collect labelled datasets};
+\node[uca] (a2) at (16.6,-1.9) {Extract patch features (cloud GPU)};
+\node[uca] (a3) at (16.6,-3.6) {Train classifier head};
+\node[uca] (a4) at (16.6,-5.3) {Calibrate, set verdict limits};
+\node[uca] (a5) at (16.6,-7.0) {Evaluate on unseen generators};
+\node[uca] (a6) at (16.6,-8.7) {Update watermark and notice rules};
+\node[uca] (a7) at (16.6,-10.4) {Deploy the application};
+% ---- associations
+\foreach \uu in {u1,u2,u3,u4,u5,u6,u7,u8,u9}{\draw[thick,cLine] (0.55,-5.1) -- (\uu.west);}
+\foreach \aa in {a1,a2,a3,a4,a5,a6,a7}{\draw[thick,cLine] (21.35,-3.1) -- (\aa.east);}
+\draw[thick,cLine] (21.35,-10.1) -- (a7.east);
+% ---- include / extend (arrow from the base use case to the included one; from the extension to the base)
+\draw[rel] (u1) -- node[lab] {\guillemotleft include\guillemotright} (m1);
+\draw[rel] (u2) -- node[lab] {\guillemotleft include\guillemotright} (m2);
+\draw[rel] (u1.south east) -- node[lab,pos=0.62] {\guillemotleft include\guillemotright} (m2.north west);
+\draw[rel] (u4) -- node[lab] {\guillemotleft include\guillemotright} (m3);
+\draw[rel] (m4.south west) -- node[lab,pos=0.42] {\guillemotleft extend\guillemotright} (u4.north east);
+\draw[rel] (m5.north west) -- node[lab,pos=0.42] {\guillemotleft extend\guillemotright} (u4.south east);
+\draw[rel] (m6.north west) -- node[lab,pos=0.42] {\guillemotleft extend\guillemotright} (u5.south east);
+\draw[rel] (a3) -- node[lab,right] {\guillemotleft include\guillemotright} (a2);
+\draw[rel] (a2) -- node[lab,right] {\guillemotleft include\guillemotright} (a1);
+\draw[rel] (a5) -- node[lab,right] {\guillemotleft include\guillemotright} (a4);
 \end{tikzpicture}}

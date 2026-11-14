@@ -1,15 +1,15 @@
-% Data flow diagram, level 0 (context diagram)
-\resizebox{0.95\linewidth}{!}{%
+% Data flow diagram, level 0 (context diagram): the whole system as one process and every external entity
+\resizebox{\linewidth}{!}{%
 \begin{tikzpicture}
-\node[proc,minimum size=3.4cm,text width=2.8cm] (sys) at (0,0) {\textbf{0}\\Deepfake detection system};
-\node[actor,text width=2.4cm] (user) at (-6.2,0) {User\\(student, journalist, analyst)};
-\node[actor,text width=2.4cm] (admin) at (6.2,0) {Project team\\(administrator)};
-\node[store,text width=3.0cm] (data) at (0,-3.6) {Public datasets and\\pretrained CLIP weights};
-\draw[arr] (user.east) ++(0,0.35) -- node[above,font=\scriptsize,sloped,pos=0.5] {file} ($(sys.west)+(0,0.35)$);
-\draw[arr] ($(sys.west)+(0,-0.35)$) -- node[below,font=\scriptsize,pos=0.5] {score, verdict,} ($(user.east)+(0,-0.35)$);
-\node[font=\scriptsize] at (-3.35,-0.95) {heatmap, text};
-\draw[arr] (admin.west) ++(0,0.35) -- node[above,font=\scriptsize] {trained heads,} ($(sys.east)+(0,0.35)$);
-\node[font=\scriptsize] at (3.35,1.05) {calibration};
-\draw[arr] ($(sys.east)+(0,-0.35)$) -- node[below,font=\scriptsize] {evaluation results} ($(admin.west)+(0,-0.35)$);
-\draw[arr] (data) -- node[right,font=\scriptsize] {training inputs} (sys.south);
+\node[proc,minimum size=3.6cm,text width=2.9cm,font=\small] (sys) at (0,0) {\textbf{0}\\Deepfake Detection System};
+\node[actor,text width=2.6cm] (user) at (-7.5,0) {\textbf{User}\\(student, journalist, analyst)};
+\node[actor,text width=2.6cm] (team) at (7.5,0) {\textbf{Project team}\\(administrator)};
+\node[actor,text width=3.0cm] (data) at (-3.6,-4.4) {\textbf{Public datasets}\\(OpenFake, DiffSeg30k)};
+\node[actor,text width=3.0cm] (clip) at (3.6,-4.4) {\textbf{Model hub}\\(pretrained CLIP weights)};
+\draw[arr] ($(user.east)+(0,0.45)$) -- node[above,font=\scriptsize] {image file, model choice} ($(sys.west)+(0,0.45)$);
+\draw[arr] ($(sys.west)+(0,-0.45)$) -- node[below,font=\scriptsize,align=center] {Trust Score, verdict, heatmap,\\explanation, notices, report,\\or error message} ($(user.east)+(0,-0.45)$);
+\draw[arr] ($(team.west)+(0,0.45)$) -- node[above,font=\scriptsize] {training data, settings} ($(sys.east)+(0,0.45)$);
+\draw[arr] ($(sys.east)+(0,-0.45)$) -- node[below,font=\scriptsize,align=center] {evaluation results,\\calibration report} ($(team.west)+(0,-0.45)$);
+\draw[arr] (data.north) -- node[left,font=\scriptsize,align=center,pos=0.45] {labelled real\\and AI images} (sys.south west);
+\draw[arr] (clip.north) -- node[right,font=\scriptsize,align=center,pos=0.45] {encoder\\weights} (sys.south east);
 \end{tikzpicture}}

@@ -1,0 +1,41 @@
+% Data flow diagram, level 2: processes 2.0 (Analyse image) and 3.0 (Calibrate and assign verdict) opened up
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[sp/.style={proc,minimum size=2.5cm,text width=2.05cm,font=\footnotesize},ds/.style={store,text width=2.4cm,font=\footnotesize}]
+% ---- process 2.0
+\node[sp] (a1) at (0,0) {\textbf{2.1}\\Cut 10 patches, native resolution};
+\node[sp] (a2) at (4.2,0) {\textbf{2.2}\\Re-save each patch as JPEG q95};
+\node[sp] (a3) at (8.4,0) {\textbf{2.3}\\Encode patches with CLIP};
+\node[sp] (a4) at (12.6,0) {\textbf{2.4}\\Score each patch with the head};
+\node[sp] (a5) at (16.8,0) {\textbf{2.5}\\Average scores, build $3\times3$ grid};
+\node[ds] (d1) at (8.4,3.2) {D1 \;CLIP encoder weights};
+\node[ds] (d2) at (12.6,3.2) {D2 \;Trained heads};
+% ---- process 3.0
+\node[sp] (b1) at (8.4,-5.6) {\textbf{3.1}\\Platt scaling $p=\sigma(a\,s+c)$};
+\node[sp] (b2) at (12.6,-5.6) {\textbf{3.2}\\Compute Trust Score $T$};
+\node[sp] (b3) at (16.8,-5.6) {\textbf{3.3}\\Assign verdict band};
+\node[ds] (d3) at (12.6,-9.0) {D3 \;Calibration and verdict limits};
+% ---- boundaries of the two level-1 processes
+\begin{scope}[on background layer]
+\node[draw=cLine,dashed,thick,rounded corners=6pt,fit=(a1)(a5)(d1)(d2),inner sep=10pt,label={[font=\small\bfseries,anchor=north west]north west:Process 2.0: Analyse image}] {};
+\node[draw=cLine,dashed,thick,rounded corners=6pt,fit=(b1)(b3)(d3),inner sep=10pt,label={[font=\small\bfseries,anchor=north east]north east:Process 3.0: Calibrate and assign verdict}] {};
+\end{scope}
+% ---- in and out
+\node[boxw,text width=2.6cm,font=\footnotesize] (in) at (-4.4,0) {from 1.0\\decoded image};
+\node[boxw,text width=2.6cm,font=\footnotesize] (outh) at (21.4,0) {to 5.0\\patch scores for heatmap};
+\node[boxw,text width=2.6cm,font=\footnotesize] (outv) at (21.4,-5.6) {to 5.0\\Trust Score, verdict};
+% ---- flows
+\draw[arr] (in) -- (a1);
+\draw[arr] (a1) -- node[above,font=\scriptsize] {10 patches} (a2);
+\draw[arr] (a2) -- node[above,font=\scriptsize] {JPEG patches} (a3);
+\draw[arr] (a3) -- node[above,font=\scriptsize] {features $z_i$} (a4);
+\draw[arr] (a4) -- node[above,font=\scriptsize] {scores $s_i$} (a5);
+\draw[arr] (d1) -- node[right,font=\scriptsize] {encoder} (a3);
+\draw[arr] (d2) -- node[right,font=\scriptsize] {$\mathbf{w}, b$} (a4);
+\draw[arr] (a5) -- node[above,font=\scriptsize] {grid} (outh);
+\draw[arr] (a5.south) -- ++(0,-2.0) -| node[pos=0.25,above,font=\scriptsize] {image score $s$} (b1.north);
+\draw[arr] (b1) -- node[above,font=\scriptsize] {$p$} (b2);
+\draw[arr] (b2) -- node[above,font=\scriptsize] {$T$} (b3);
+\draw[arr] (b3) -- (outv);
+\draw[arr] (d3.west) -| node[pos=0.3,below,font=\scriptsize] {$a, c$} (b1.south);
+\draw[arr] (d3.east) -| node[pos=0.3,below,font=\scriptsize] {limits 54 and 17} (b3.south);
+\end{tikzpicture}}
