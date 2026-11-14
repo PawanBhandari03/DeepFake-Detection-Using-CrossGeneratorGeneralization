@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw, ImageFont
 from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.oxml.ns import qn
-from pptx.enum.text import MSO_ANCHOR
+from pptx.enum.text import MSO_ANCHOR, MSO_AUTO_SIZE
 from pptx.util import Emu, Inches, Pt
 import math
 from lxml import etree
@@ -76,18 +76,21 @@ def new_slide(title: str, size: int = 36):
     return s
 
 
-def fill_body(slide, items, size: int = 20, left=0.6, top=1.75, width=8.8, height=5.45, bold_first: bool = False, middle: bool = True):
+def fill_body(slide, items, size: int = 20, left=0.6, top=1.75, width=8.8, height=5.45, bold_first: bool = False, middle: bool = True, gap: int = 0):
     body = slide.placeholders[1]
     body.left, body.top, body.width, body.height = Inches(left), Inches(top), Inches(width), Inches(height)
     tf = body.text_frame
     tf.word_wrap = True
     tf.vertical_anchor = MSO_ANCHOR.MIDDLE if middle else MSO_ANCHOR.TOP
+    tf.auto_size = MSO_AUTO_SIZE.NONE
     first = True
     for it in items:
         level, text = (it if isinstance(it, tuple) else (0, it))
         p = tf.paragraphs[0] if first else tf.add_paragraph()
         first = False
         p.level = level
+        if gap:
+            p.space_after = Pt(gap)
         r = p.add_run()
         r.text = text
         r.font.size = Pt(size - 2 * level)
@@ -524,20 +527,20 @@ content_slide("Applications", [
     "Social media and content moderation: flagging likely AI images for a human reviewer.",
     "Banks, insurers and KYC teams: first-level screening of submitted documents (planned).",
     "Education and awareness: showing why a picture looks synthetic through the heatmap and explanation.",
-    "Personal use: checking a picture received in a messaging group."], size=20,
+    "Personal use: checking a picture received in a messaging group."], size=22, top=1.55, height=5.4, gap=14,
     note="Applications are screening aids: the Trust Score is not forensic proof.")
 content_slide("Conclusion", [
     "A frozen CLIP encoder with a small trained head, a degraded-copy training set and a calibrated, explainable scoring layer detects most AI images from unseen generators.",
     "The system reaches ROC-AUC 0.982 on 20 unseen generators, against 0.831 for an EfficientNet baseline, and accepts 92% of real photographs.",
     "The proof model, which never saw an OpenAI or Google image, still catches 84% of ChatGPT images.",
-    "The layered design lets the same Trust Score serve images, videos and documents."], size=20,
+    "The layered design lets the same Trust Score serve images, videos and documents."], size=22, top=1.55, height=5.4, gap=14,
     note="Summary of Phase 1. Video and document analysers are designed for the next phases.")
 content_slide("Future Scope", [
     "Build and evaluate the video analyser on FaceForensics++ and Celeb-DF.",
     "Build the document analyser (dual-stream U-Net, OCR, rule checks) and test it on DocTamper and human-made forgeries.",
     "Pixel-level maps to find a small machine-made region inside a real photograph.",
     "Better robustness to compression and resizing; add new generators to the unseen-source tests.",
-    "A separate front end that calls the analysers through an API."], size=20,
+    "A separate front end that calls the analysers through an API."], size=22, top=1.55, height=5.4, gap=14,
     note="What comes next, in order of the project plan.")
 
 # ================================================================== references (clickable)
@@ -558,15 +561,17 @@ REFS = [
 for part in (0, 1):
     s = new_slide("References")
     body = s.placeholders[1]
-    body.left, body.top, body.width, body.height = Inches(0.5), Inches(1.75), Inches(9.0), Inches(5.45)
+    body.left, body.top, body.width, body.height = Inches(0.5), Inches(1.55), Inches(9.0), Inches(5.5)
     tf = body.text_frame
     tf.word_wrap = True
     tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    tf.auto_size = MSO_AUTO_SIZE.NONE
     for k, (txt, url) in enumerate(REFS[part * 6:part * 6 + 6]):
         p = tf.paragraphs[0] if k == 0 else tf.add_paragraph()
         r = p.add_run()
         r.text = f"{part * 6 + k + 1}. {txt}"
-        r.font.size = Pt(15)
+        p.space_after = Pt(12)
+        r.font.size = Pt(18)
         r.hyperlink.address = url
     notes(s, "Each reference is a clickable link to its arXiv page. The full list of 32 references is in the research paper.")
 
